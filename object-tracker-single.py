@@ -5,9 +5,11 @@ import cv2
 import argparse as ap
 import get_points
 import json
+import numpy as np
+import os.path
 
 
-def run(side, pos, four_points, source=0, dispLoc=False):
+def run(side_pos, four_points, source=0, dispLoc=False):
     # Create the VideoCapture object
     cam = cv2.VideoCapture(source)
 
@@ -16,8 +18,7 @@ def run(side, pos, four_points, source=0, dispLoc=False):
         print "Video device or file couldn't be opened"
         exit()
 
-    res_key = side + "" + str(pos)
-    result = {res_key: []}
+    result = {side_pos: []}
 
     while True:
         retval, img = cam.read()
@@ -29,7 +30,7 @@ def run(side, pos, four_points, source=0, dispLoc=False):
     if len(four_points) is 0:
         result["points"] = get_four_points(img)
     else:
-        result["points"] = four_points
+        result["points"] = np.array(four_points)
     img = four_point_transform(img, result["points"])
 
     # Co-ordinates of objects to be tracked
@@ -66,14 +67,14 @@ def run(side, pos, four_points, source=0, dispLoc=False):
         pt2 = (int(rect.right()), int(rect.bottom()))
         cv2.rectangle(img, pt1, pt2, (255, 255, 255), 3)
         # print "Object tracked at [{}, {}] \r".format(pt1, pt2),
+        result[side_pos].append([int(rect.right()), int(rect.bottom())])
         if dispLoc:
             loc = (int(rect.left()), int(rect.top() - 20))
             txt = "Object tracked at [{}, {}]".format(pt1, pt2)
 
-            # print "[", int(rect.right()), ", ", int(rect.bottom()), "],"
             cv2.putText(img, txt, loc,
                         cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255, 255, 255), 1)
-        result[res_key].append([int(rect.right()), int(rect.bottom())])
+
         cv2.namedWindow("tracking...", cv2.WINDOW_NORMAL)
         cv2.imshow("tracking...", img)
 
@@ -99,6 +100,7 @@ def run(side, pos, four_points, source=0, dispLoc=False):
             break
     # Relase the VideoCapture object
     cam.release()
+    result["points"] = result["points"].tolist()
     return result
 
 
@@ -117,19 +119,19 @@ if __name__ == "__main__":
     else:
         source = int(args["deviceID"])
 
-    side = raw_input("Select 'o' for offense or 'd' for defense\n")
-    pos = input("Select position 1 2 3 4 5\n")
+    side_pos = raw_input("o or d,then position #, ex: o1 is offense 1\n")
     result = {}
     four_points = []
-    if str(raw_input("'y' if has four points, 'n' otherwise")) is 'y':
-        for i in range(4):
-            print "x for point %d" % i + 1
-            x_ = int(raw_input())
-            print "y for point %d" % i + 1
-            y_ = int(raw_input())
-            four_points.append([x_, y_])
-    print "args", args["videoFile"]
-    result = run(side, pos, four_points, source, args["dispLoc"])
-    print result
-    with open(args["videoFile"] + "_" + side + str(pos) + ".json", 'w') as f:
-        json.dumps(result, f)
+
+    file = args["videoFile"] + ".json"
+    json_data = {}
+    if os.path.exists(file):
+        with open(file) as json_file:
+            json_data = json.load(json_file)
+            four_points = np.array(json_data["points"])
+
+    result = run(side_pos, four_points, source, args["dispLoc"])
+    with open(file, 'w') as f:
+        json_data[side_pos] = result[side_pos]
+        json_data["points"] = result["points"]
+        f.write(json.dumps(json_data, sort_keys=True))
