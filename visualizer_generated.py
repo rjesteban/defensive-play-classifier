@@ -3,13 +3,16 @@
 # import some libraries
 from __future__ import print_function
 import matplotlib
+import os
+os.system('ffmpeg')
+matplotlib.use('TKAgg')
+matplotlib.verbose.level = 'debug'
 import json
 import matplotlib.pyplot as plt
 import numpy as np
 import matplotlib as mpl
 import matplotlib.animation as animation
 
-matplotlib.use('TKAgg')
 
 mpl.rcParams['font.family'] = ['Bitstream Vera Sans']
 
@@ -28,10 +31,10 @@ def draw_court(axis):
 
 def animate(n):
     for p, x, y in player_xy[n]:
-        player_circ[p].center = (x, y)
-        player_text[p].set_text(p)
+        player_circ[p].center = (x, 50 - y)
+        player_text[p].set_text((p % 5) + 1 )
         player_text[p].set_x(x)  # set the text x position
-        player_text[p].set_y(y)  # set text y position
+        player_text[p].set_y(50 - y)  # set text y position
     return tuple(player_text)
 
 
@@ -54,7 +57,7 @@ player_xy = []
 for frame in range(len(xy[0])):  # 305
     fr = []
     for p in range(len(xy)):  # 10
-        xy[p][frame].insert(0, (p % 5) + 1 )
+        xy[p][frame].insert(0, p)
         fr.append(xy[p][frame])
     player_xy.append(fr)
 
@@ -67,7 +70,7 @@ draw_court([0, 100, 0, 50])  # draw the court
 player_text = range(10)  # create player text vector
 player_circ = range(10)  # create player circle vector
 for i in range(10):  # create circle object and text object for each player
-    col = ['w', 'r'] if i < 5 else ['r', 'w']  # color scheme
+    col = ['w', 'k'] if i < 5 else ['k', 'w']  # color scheme
     player_circ[i] = plt.Circle((0, 0), 2.2, facecolor=col[0], edgecolor='k')
     player_text[i] = ax.text(0, 0, '', color=col[1], ha='center', va='center')
 
@@ -77,5 +80,5 @@ ani = animation.FuncAnimation(fig, animate,
                               blit=True,
                               interval=5,
                               repeat=False, save_count=0)
-ani.save('Event_%s.mp4' % (file_name), dpi=100, fps=25)
+ani.save('Event_%s.mp4' % (file_name), writer=animation.FFMpegFileWriter(extra_args=['--verbose-debug']), dpi=100, fps=25)
 plt.close('all')
