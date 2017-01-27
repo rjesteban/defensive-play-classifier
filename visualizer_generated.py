@@ -1,7 +1,7 @@
 # converts moments to videos
 
 # import some libraries
-# from __future__ import print_function
+from __future__ import print_function
 import matplotlib
 import json
 import matplotlib.pyplot as plt
@@ -27,11 +27,7 @@ def draw_court(axis):
 
 
 def animate(n):
-    print "n" * 10, " ", n
-    print(player_xy[n][0][1])
-
     for p, x, y in player_xy[n]:
-        
         player_circ[p].center = (x, y)
         player_text[p].set_text(p)
         player_text[p].set_x(x)  # set the text x position
@@ -53,7 +49,6 @@ def init():
 
 xy = ([data["o" + str(i + 1)] for i in range(5)] +
       [data["d" + str(i + 1)] for i in range(5)])
-print len(xy[0])
 player_xy = []
 
 for frame in range(len(xy[0])):  # 305
@@ -61,7 +56,6 @@ for frame in range(len(xy[0])):  # 305
     for p in range(len(xy)):  # 10
         xy[p][frame].insert(0, (p % 5) + 1 )
         fr.append(xy[p][frame])
-        print xy[p][frame]
     player_xy.append(fr)
 
 #  =================ANIMATION=================
