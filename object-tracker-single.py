@@ -9,7 +9,7 @@ import numpy as np
 import os.path
 
 
-def run(side_pos, four_points, source=0, dispLoc=False):
+def run(side_pos, four_points, res_width, res_height, source=0, dispLoc=False):
     # Create the VideoCapture object
     cam = cv2.VideoCapture(source)
 
@@ -33,6 +33,28 @@ def run(side_pos, four_points, source=0, dispLoc=False):
         result["points"] = np.array(four_points)
     img = four_point_transform(img, result["points"])
 
+    if res_height < 0 and res_width < 0:
+        resize_point = get_points.run(img, instruction=1)
+        res_width, res_height = resize_point[0][2], resize_point[0][3]
+    else:
+        resize_point = [(0, 0, res_width, res_height)]
+    original_y, original_x, channels = img.shape
+    x = resize_point[0][2]  # 475
+    y = resize_point[0][3]  # 461
+    what_is_x = (y * 19) / 50.0
+    remaining_x = original_x - what_is_x
+    remaining_x = (remaining_x * what_is_x) / x
+    print remaining_x
+    width = int(remaining_x + what_is_x)
+
+    img = cv2.resize(img, (width, y))
+    original_y, original_x, channels = img.shape
+    y = 400
+    width = y * original_x / original_y
+    img = cv2.resize(img, (width, y))
+    original_y, original_x, channels = img.shape
+
+    result["rw"], result["rh"] = res_width, res_height
     # Co-ordinates of objects to be tracked
     # will be stored in a list named `points`
     points = get_points.run(img)
@@ -48,6 +70,7 @@ def run(side_pos, four_points, source=0, dispLoc=False):
     # Create the tracker object
     tracker = dlib.correlation_tracker()
     # Provide the tracker the initial position of the object
+    img = cv2.resize(img, (width, y))
     tracker.start_track(img, dlib.rectangle(*points[0]))
 
     while True:
@@ -57,6 +80,7 @@ def run(side_pos, four_points, source=0, dispLoc=False):
             print "*" * 10 + "End" + "*" * 10
             break
         img = four_point_transform(img, result["points"])
+        img = cv2.resize(img, (width, y))
         img_clean = img.copy()
         # Update the tracker
         tracker.update(img)
@@ -67,7 +91,8 @@ def run(side_pos, four_points, source=0, dispLoc=False):
         pt2 = (int(rect.right()), int(rect.bottom()))
         cv2.rectangle(img, pt1, pt2, (255, 255, 255), 3)
         # print "Object tracked at [{}, {}] \r".format(pt1, pt2),
-        result[side_pos].append([int(rect.right()), int(rect.bottom())])
+        result[side_pos].append([int(rect.right()) / 8.0,
+                                int(rect.bottom()) / 8.0])
         if dispLoc:
             loc = (int(rect.left()), int(rect.top() - 20))
             txt = "Object tracked at [{}, {}]".format(pt1, pt2)
@@ -125,13 +150,17 @@ if __name__ == "__main__":
 
     file = args["videoFile"] + ".json"
     json_data = {}
+    width, height = -1, -1
     if os.path.exists(file):
         with open(file) as json_file:
             json_data = json.load(json_file)
             four_points = np.array(json_data["points"])
-
-    result = run(side_pos, four_points, source, args["dispLoc"])
+            if "rw" in json_data and "rh" in json_data:
+                width, height = json_data["rw"], json_data["rh"]
+    result = run(side_pos, four_points, width, height, source, args["dispLoc"])
     with open(file, 'w') as f:
         json_data[side_pos] = result[side_pos]
+        json_data["rw"] = result["rw"]
+        json_data["rh"] = result["rh"]
         json_data["points"] = result["points"]
         f.write(json.dumps(json_data, sort_keys=True))
