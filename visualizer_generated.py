@@ -3,28 +3,28 @@
 # import some libraries
 from __future__ import print_function
 import matplotlib
-import os
-os.system('ffmpeg')
+# import os
+# os.system('ffmpeg')
 matplotlib.use('TKAgg')
-matplotlib.verbose.level = 'debug'
+# matplotlib.verbose.level = 'debug'
 import json
 import matplotlib.pyplot as plt
 import numpy as np
 import matplotlib as mpl
 import matplotlib.animation as animation
+import matplotlib.image as mpimg
 
 
 mpl.rcParams['font.family'] = ['Bitstream Vera Sans']
 
-file_name = "videos/006.mp4.json"
-json_data = open('videos/006.mp4.json')
+file_name = "006.mp4.json"
+json_data = open(file_name)
 data = json.load(json_data)
 length = len(data["o1"])
 
 
 #  Animation function / loop
 def draw_court(axis):
-    import matplotlib.image as mpimg
     img = mpimg.imread('nba_court_T.png')
     plt.imshow(img, extent=axis, zorder=0)
 
@@ -80,5 +80,5 @@ ani = animation.FuncAnimation(fig, animate,
                               blit=True,
                               interval=5,
                               repeat=False, save_count=0)
-ani.save('Event_%s.mp4' % (file_name), writer=animation.FFMpegFileWriter(extra_args=['--verbose-debug']), dpi=100, fps=25)
+ani.save('Event%s.mp4' % (file_name), dpi=100, fps=30)
 plt.close('all')
