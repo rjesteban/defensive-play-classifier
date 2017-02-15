@@ -31,7 +31,7 @@ def run(side_pos, four_points, res_width, res_height, source=0, dispLoc=False):
         result["points"] = get_four_points(img)
     else:
         result["points"] = np.array(four_points)
-    img = four_point_transform(img, result["points"])
+    # img = four_point_transform(img, result["points"])
 
     if res_height < 0 and res_width < 0:
         resize_point = get_points.run(img, instruction=1)
@@ -79,11 +79,11 @@ def run(side_pos, four_points, res_width, res_height, source=0, dispLoc=False):
         if not retval:
             print "*" * 10 + "End" + "*" * 10
             break
-        img = four_point_transform(img, result["points"])
+        # img = four_point_transform(img, result["points"])
         img = cv2.resize(img, (width, y))
         img_clean = img.copy()
         # Update the tracker
-        tracker.update(img)
+        print "score: ", tracker.update(img)
         # Get the position of the object, draw a
         # bounding box around it and display it.
         rect = tracker.get_position()
@@ -91,8 +91,8 @@ def run(side_pos, four_points, res_width, res_height, source=0, dispLoc=False):
         pt2 = (int(rect.right()), int(rect.bottom()))
         cv2.rectangle(img, pt1, pt2, (255, 255, 255), 3)
         # print "Object tracked at [{}, {}] \r".format(pt1, pt2),
-        result[side_pos].append([int(rect.right()) / 8.0,
-                                int(rect.bottom()) / 8.0])
+        result[side_pos].append([(rect.left() + rect.right() / 2.0) / 8.0,
+                                (rect.top() + rect.bottom() / 2.0) / 8.0])
         if dispLoc:
             loc = (int(rect.left()), int(rect.top() - 20))
             txt = "Object tracked at [{}, {}]".format(pt1, pt2)
