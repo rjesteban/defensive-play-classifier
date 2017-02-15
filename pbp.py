@@ -1,6 +1,15 @@
 import json
+import math
 import os
 import requests
+
+
+def time_difference(time1, time2):
+    time_1 = [int(i) for i in time1.split(':')]
+    time_2 = [int(i) for i in time2.split(':')]
+    t1 = (time_1[0] * 60) + time_1[1]
+    t2 = (time_2[0] * 60) + time_2[1]
+    return int(math.fabs(t1 - t2))
 
 
 def acquire_pbp_json(id):
@@ -41,9 +50,18 @@ def pick_possessions(pbp):
     row_set = data['resultSets'][0]['rowSet']
     moments = []
 
-    for i in range(len(row_set)):
-        if ((1 <= row_set[i][2] <= 2 or row_set[i][2] == 5) and
-           row_set[i - 1][2] != 5):
+    for i in range(1, len(row_set)):
+        shot_attempt = (1 <= row_set[i][2] <= 2)
+        turnover = row_set[i][2] == 5
+        stop_play = row_set[i][2] in [7, 9] and row_set[i - 1][2] not in [7, 9]
+        came_from_steal = (row_set[i - 1][2] == 5 and
+                           row_set[i - 1][3] <= 2 and
+                           time_difference(row_set[i - 1][6],
+                           row_set[i - 1][6]) < 5)
+        follow_up = (row_set[i - 1][2] == 4 and
+                     time_difference(row_set[i - 1][6], row_set[i - 1][6]) < 5)
+        attempt = (shot_attempt and not follow_up) or turnover or stop_play
+        if attempt and not came_from_steal:
             moments.append(row_set[i][:3])
     return moments
 
@@ -52,6 +70,10 @@ if __name__ == '__main__':
     ids = ['0021500316', '0021500270', '0021500149', '0021500197',
            '0021500428', '0021500350', '0021500336',
            '0021500476', '0021500582']
+    # ids = ['0021500582']
+    moments = []
 
     for id in ids:
-        acquire_pbp_json(id)
+        # acquire_pbp_json(id)
+        moments += pick_possessions('pbp/' + id + 'pbp.json')
+    print len(moments)
