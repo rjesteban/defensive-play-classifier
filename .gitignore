@@ -1,5 +1,10 @@
 # sportvudata
 sportvu/0021500391.json
+data/sportvu/
+
+# play by play data
+data/pbp/
+
 
 # folder
 videos/
