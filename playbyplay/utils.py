@@ -2,6 +2,8 @@ import json
 import os
 import requests
 
+PATH = 'data/pbp/'
+
 
 def acquire_pbp_json(id):
     header_data = {
@@ -16,13 +18,33 @@ def acquire_pbp_json(id):
         'Cache-Control': 'max-age=0',
         'Connection': 'keep-alive'
     }
-
     game_url = ('http://stats.nba.com/stats/playbyplayv2?' +
                 'EndPeriod=0&EndRange=0&GameID=' + id +
                 '&RangeType=0&StartPeriod=0&StartRange=0')
     response = requests.get(game_url, headers=header_data)
     data = response.json()
-    if not os.path.exists(os.path.dirname('../data/pbp/')):
+    if not os.path.exists(os.path.dirname(PATH)):
         os.makedirs('pbp')
-    with open('../data/pbp/' + id + 'pbp.json', 'w') as file:
+    with open(PATH + id + 'pbp.json', 'w') as file:
         json.dump(data, file)
+
+
+def get_pbp(id):
+    return json.load(open(PATH + id + 'pbp.json'))
+
+
+def find_index(data, eid):
+    index = eid
+    diff = eid - int(data['resultSets'][0]['rowSet'][index][1])
+    if diff == 0:
+        return index
+    if diff > 0:
+        while (diff > 0):
+            diff = eid - int(data['resultSets'][0]['rowSet'][index][1])
+            index += 1
+        return index - 1
+    else:
+        while(diff < 0):
+            diff = eid - int(data['resultSets'][0]['rowSet'][index][1])
+            index -= 1
+        return index + 1

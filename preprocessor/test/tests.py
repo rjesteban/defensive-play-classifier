@@ -1,8 +1,9 @@
+from preprocessor.utils import get_distance
+import json
 import unittest
-from utils import get_distance
 
 
-class TestSportVUUtilFunctions(unittest.TestCase):
+class TestPreprocessorFunctions(unittest.TestCase):
 
     def test_get_distance(self):
         x1, y1, x2, y2 = 27.35625, 12.54398, 36.06287, 29.64372

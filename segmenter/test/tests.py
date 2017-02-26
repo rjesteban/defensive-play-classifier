@@ -1,8 +1,8 @@
 import unittest
-from segmenter import time_difference
+from segmenter.utils import time_difference
 
 
-class TestSegmenterFunctions(unittest.TestCase):
+class TestSegmenterUtilFunctions(unittest.TestCase):
 
     def test_time_difference(self):
         self.assertEqual(time_difference("11:34", "11:34"), 0)

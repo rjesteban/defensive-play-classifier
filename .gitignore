@@ -5,6 +5,9 @@ data/sportvu/
 # play by play data
 data/pbp/
 
+# data
+data/test/0021500391.json
+data/test/0021500391pbp.json
 
 # folder
 videos/
