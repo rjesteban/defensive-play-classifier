@@ -83,7 +83,7 @@ def init():  # this is what matplotlib's animation will create before drawing th
 
 
 # the order of events does not match up, so we have to use the eventIds. This loop finds the correct event for a given id# .
-search_id = 4
+search_id = 74
 
 
 def find_moment(search_id):

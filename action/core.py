@@ -13,13 +13,13 @@ def get_action(gameid, eid):
 
 class Action(object):
 
-    def __init__(self, gameid, eventid, moment, offense, defense):
-        self.eventid = eventid
+    def __init__(self, gameid, eid, moment, offense, defense):
+        self.eventid = eid
         self.coords = [coord[5] for coord in moment]
         self.quarter = moment[0][0]  # to be used for transform wlog fxn
         self.offense = offense
         self.offense = defense
-        self.gameid
+        self.gameid = gameid
 
     def save(self):
         context = {}

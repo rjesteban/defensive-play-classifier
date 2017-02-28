@@ -1,5 +1,7 @@
-from segmenter.utils import time_difference
-from sportvu.utils import determine_offs_defs, get_playersoncourt, get_moment
+from action.core import Action
+from segmenter.utils import time_difference, all_on_one_side, within_the_paint
+from sportvu.utils import get_moment, determine_offs_defs
+
 
 # time difference quota is still under experiment, EDA needed
 def pick_possessions(gameid):
@@ -48,33 +50,24 @@ def pick_possessions(gameid):
 
 
 # Rule based algorithm
-"""
-    extract after inbound and after timeout plays add to play_list
-      for each play in play_list:
-        initialize empty list as frame_list
-        inside_count = 0
-        for each frame in the play:
-          [
-          if all players are on one side of the court &
-          ball is not held in the paint & inside_count <= 10:
-            add the frame to frame_list
-            inside_count = 0
-          if ball is held in paint and inside_count <= 10
-            add the frame to frame_list
-            inside_count = inside_count + 1
-          ] for length of frame_list >= 75 & frames added were contiguous:
-                identify frame_list as action
-"""
-def convert_moment_to_action(data eid):
+def convert_moment_to_action(data, eid):
     moment = get_moment(data, eid)
     gameid = str(data['gameid'])
-    players = determine_offs_defs(data, gameid, eid)
-    
-    #########################################################
-    #                                                       #
-    #                                                       #
-    #             TODO: RULE BASED ALGORITHM                #
-    #                                                       #
-    #                                                       #
-    #########################################################
-    raise Exception(gameid, eventid, moment, players['offense'], players['defense']")
+    frames = []
+    inside_count = 0
+    for fr, frame in enumerate(moment):
+        ball = moment[fr][5][0]
+        if all_on_one_side(moment, eid, fr):
+            if within_the_paint(ball, eid):
+                inside_count += 1
+            frames.append(frame)
+        else:
+            inside_count = 0
+            frames = []
+    if len(frames) < 100:
+        return None
+    else:
+        players = determine_offs_defs(data, gameid, eid)
+        offense = players['offense']
+        defense = players['defense']
+        return Action(gameid, eid, frames, offense, defense)
