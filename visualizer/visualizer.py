@@ -13,7 +13,7 @@ import matplotlib.animation as animation
 mpl.rcParams['font.family'] = ['Bitstream Vera Sans']
 
 
-json_data = open('sportvu/0021500492.json')  # import the data from wherever you saved it.
+json_data = open('../data/sportvu/0021500582.json')  # import the data from wherever you saved it.
 data = json.load(json_data)   #  load the data
 
 
@@ -58,13 +58,16 @@ def draw_court(axis):
 
 def animate(n):  # matplotlib's animation function loops through a function n times that draws a different frame on each iteration
     for i,ii in enumerate(player_xy[n]):  # loop through all the players
-        player_circ[i].center = (ii[1], ii[2])  # change each players xy position
+        player_circ[i].center = (ii[1], 50 - ii[2])  # change each players xy position
         player_text[i].set_text(str(jerseydict[ii[0]]))  # draw the text for each player. 
         player_text[i].set_x(ii[1])  # set the text x position
-        player_text[i].set_y(ii[2])  # set text y position
-    ball_circ.center = (ball_xy[n,0],ball_xy[n,1])  # change ball xy position
+        player_text[i].set_y(50 - ii[2])  # set text y position
+    ball_circ.center = (ball_xy[n,0], 50 - ball_xy[n,1])  # change ball xy position
     ball_circ.radius = 1.1  # i could change the size of the ball according to its height, but chose to keep this constant
-    return tuple(player_text) + tuple(player_circ) + (ball_circ,)
+    frame_text.set_text(str(n))
+    frame_text.set_x(10)
+    frame_text.set_y(10)
+    return tuple(player_text) + tuple(player_circ) + (ball_circ,) + (frame_text,)
 
 def init():  # this is what matplotlib's animation will create before drawing the first frame. 
     for i in range(10):  # set up players
@@ -75,11 +78,12 @@ def init():  # this is what matplotlib's animation will create before drawing th
     dx = 5
     plt.xlim([0-dx,100+dx])  # set axis
     plt.ylim([0-dx,50+dx])
-    return tuple(player_text) + tuple(player_circ) + (ball_circ,)
+    frame_text.set_text('0')
+    return tuple(player_text) + tuple(player_circ) + (ball_circ,) + (frame_text,)
 
 
 # the order of events does not match up, so we have to use the eventIds. This loop finds the correct event for a given id# .
-search_id = 43
+search_id = 4
 
 
 def find_moment(search_id):
@@ -101,11 +105,14 @@ ax = plt.gca()  # create axis object
 draw_court([0,100,0,50])  # draw the court
 player_text = range(10)  # create player text vector
 player_circ = range(10)  # create player circle vector
-ball_circ = plt.Circle((0,0), 1.1, color=[1, 0.4, 0])  # create circle object for bal
+ball_circ = plt.Circle((0,0), 1.1, color=[1, 0.4, 0])  # create circle object for ball
 for i in range(10):  # create circle object and text object for each player
-    col=['w','r'] if i<5 else ['r','w']  # color scheme
+    col=['w','b'] if i<5 else ['b','w']  # color scheme   home if i < 5 else away
     player_circ[i] = plt.Circle((0,0), 2.2, facecolor=col[0],edgecolor='k')  # player circle
     player_text[i] = ax.text(0,0,'',color=col[1],ha='center',va='center')  # player jersey  #  (text)
+frame_text = ax.annotate('', xy=[10, 10],
+                                 color='black', horizontalalignment='center',
+                                   verticalalignment='center')
 
 ani = animation.FuncAnimation(fig, animate, frames=np.arange(0,np.size(ball_xy,0)), init_func=init, blit=True, interval=5, repeat=False,\
                              save_count=0)  # function for making video

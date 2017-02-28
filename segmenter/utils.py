@@ -1,6 +1,6 @@
 # from action import Action
-import json
 import math
+
 
 PBP_PATH = 'data/pbp/'
 
@@ -15,12 +15,12 @@ def time_difference(time1, time2):
     return int(math.fabs(t1 - t2))
 
 
-def all_on_one_side(moment, eid):
-    quarter = moment[0][0]
+def all_on_one_side(m, eid, frame):
     #########################################################
     #                                                       #
     #             Check what quarter it is                  #
     #             Which side is attacking                   #
     #                                                       #
     #########################################################
-    raise Exception("Not yet implemented.")
+    # raise Exception("Not yet implemented.")
+    return len(set([0 if coord[2] < 47 else 1 for coord in m[frame][5]])) == 1
