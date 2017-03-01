@@ -73,7 +73,6 @@ def convert_moment_to_action(data, eid):
         players = determine_offs_defs(data, gameid, eid)
         offense = players['offense']
         defense = players['defense']
-        action = Action()
-        action.set_params(gameid, eid, frames, offense, defense)
+        action = Action(gameid, eid, frames, offense, defense, 0)
         action.save()
         return action

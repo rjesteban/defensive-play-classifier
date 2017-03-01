@@ -19,3 +19,7 @@ def transform_wlog(action):
         coordinates.append(entity)
     action.coords = coordinates
     return action
+
+
+def arrange_by_position(action):
+    raise Exception("Not yet implemented")

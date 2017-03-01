@@ -1,4 +1,4 @@
-from preprocessor.utils import get_distance
+from preprocessor.utils import get_distance  # , arrange_by_position
 import json
 import unittest
 
@@ -13,6 +13,8 @@ class TestPreprocessorFunctions(unittest.TestCase):
         d1, d2 = 19.1887, 19.65495
         self.assertAlmostEqual(get_distance((x1, y1), (x2, y2)), d1, places=4)
         self.assertAlmostEqual(get_distance((i1, j1), (i2, j2)), d2, places=4)
+
+#    def test_arrange_by_position(self):
 
 
 if __name__ == '__main__':
