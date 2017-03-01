@@ -1,3 +1,6 @@
+# mp4 videos
+*.mp4
+
 # sportvudata
 sportvu/0021500391.json
 data/sportvu/

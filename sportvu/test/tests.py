@@ -23,9 +23,8 @@ class TestSportVUUtilFunctions(unittest.TestCase):
         self.assertEqual(str(get_moment(testdata, 27)[0][0]), "1")
         self.assertEqual(str(get_moment(testdata, 307)[0][0]), "3")
 
-
     def test_get_players(self):
-        home = str([[201166, 'G', 'home', 4], [2550, 'G', 'home', 4], 
+        home = str([[201166, 'G', 'home', 4], [2550, 'G', 'home', 4],
                     [201149, 'C', 'home', 4],
                     [202710, 'G-F', 'home', 4], [202703, 'F', 'home', 4]])
         away = str([[1626169, 'F', 'visitor', 4], [202694, 'F', 'visitor', 4],

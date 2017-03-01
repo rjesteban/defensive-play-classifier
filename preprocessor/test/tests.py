@@ -2,6 +2,8 @@ from preprocessor.utils import get_distance
 import json
 import unittest
 
+testdata = json.load(open('data/sportvu/0021500582.json'))
+
 
 class TestPreprocessorFunctions(unittest.TestCase):
 

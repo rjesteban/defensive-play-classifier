@@ -1,7 +1,7 @@
 # converts moments to videos
 
 # import some libraries
-from __future__ import print_function
+# from __future__ import print_function
 
 import matplotlib
 matplotlib.use('TKAgg')
@@ -13,7 +13,7 @@ import matplotlib.animation as animation
 mpl.rcParams['font.family'] = ['Bitstream Vera Sans']
 
 
-json_data = open('../data/sportvu/0021500582.json')  # import the data from wherever you saved it.
+json_data = open('data/sportvu/0021500582.json')  # import the data from wherever you saved it.
 data = json.load(json_data)   #  load the data
 
 
@@ -53,7 +53,7 @@ jerseydict = dict(zip(players.playerid.values, players.jersey.values))
 #  Animation function / loop
 def draw_court(axis):
     import matplotlib.image as mpimg
-    img = mpimg.imread('nba_court_T.png')  # read image. I got this image from gmf05's github.
+    img = mpimg.imread('visualizer/nba_court_T.png')  # read image. I got this image from gmf05's github.
     plt.imshow(img,extent=axis, zorder=0)  # show the image. 
 
 def animate(n):  # matplotlib's animation function loops through a function n times that draws a different frame on each iteration
@@ -83,7 +83,7 @@ def init():  # this is what matplotlib's animation will create before drawing th
 
 
 # the order of events does not match up, so we have to use the eventIds. This loop finds the correct event for a given id# .
-search_id = 74
+search_id = 4
 
 
 def find_moment(search_id):
@@ -93,9 +93,14 @@ def find_moment(search_id):
     raise Exception("Moment not found")
 
 event_num = find_moment(search_id)
-ball_xy = np.array([x[5][0][2:5] for x in data['events'][event_num]['moments']])  # create matrix of ball data
-player_xy = np.array([np.array(x[5][1:])[:,1:4] for x in data['events'][event_num]['moments']])  # create matrix of player data
 
+moment = json.load(open('data/test/action_coords.out'))
+
+
+ball_xy_1 = np.array([x[5][0][2:5] for x in data['events'][event_num]['moments']])  # create matrix of ball data
+player_xy_1 = np.array([np.array(x[5][1:])[:,1:4] for x in data['events'][event_num]['moments']])  # create matrix of player data
+ball_xy = np.array([x[0][2:5] for x in moment])
+player_xy = np.array([np.array(x[1:])[:, 1:4] for x in moment])
 
 #  ==============================ANIMATION=================
 

@@ -1,6 +1,9 @@
 from action.core import Action
 from segmenter.utils import time_difference, all_on_one_side, within_the_paint
 from sportvu.utils import get_moment, determine_offs_defs
+import json
+
+PBP_PATH = 'data/pbp/'
 
 
 # time difference quota is still under experiment, EDA needed
@@ -70,4 +73,7 @@ def convert_moment_to_action(data, eid):
         players = determine_offs_defs(data, gameid, eid)
         offense = players['offense']
         defense = players['defense']
-        return Action(gameid, eid, frames, offense, defense)
+        action = Action()
+        action.set_params(gameid, eid, frames, offense, defense)
+        action.save()
+        return action
