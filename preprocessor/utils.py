@@ -22,4 +22,33 @@ def transform_wlog(action):
 
 
 def arrange_by_position(action):
-    raise Exception("Not yet implemented")
+    rank = {
+        'C': 0,
+        'C-F': 1,
+        'F-C': 2,
+        'F': 3,
+        'F-G': 4,
+        'G-F': 5,
+        'G': 6
+    }
+    offense = range(len(action.offense))
+    for i in range(len(action.offense)):
+        j = i
+        key = rank[action.offense[i][1]]
+        while j > 0 and rank[str(offense[j - 1][1])] > key:
+            offense[j] = offense[j - 1]
+            j -= 1
+        offense[j] = action.offense[i]
+
+    defense = range(len(action.defense))
+    for i in range(len(action.defense)):
+        j = i
+        key = rank[action.defense[i][1]]
+        while j > 0 and rank[str(defense[j - 1][1])] > key:
+            defense[j] = defense[j - 1]
+            j -= 1
+        defense[j] = action.defense[i]
+
+    action.offense = offense
+    action.defense = defense
+    return action
