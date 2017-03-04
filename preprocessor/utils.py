@@ -1,4 +1,5 @@
 import math
+import numpy as np
 
 
 def get_distance(p1, p2):
@@ -22,15 +23,7 @@ def transform_wlog(action):
 
 
 def arrange_by_position(action):
-    rank = {
-        'C': 0,
-        'C-F': 1,
-        'F-C': 2,
-        'F': 3,
-        'F-G': 4,
-        'G-F': 5,
-        'G': 6
-    }
+    rank = {'C': 0, 'C-F': 1, 'F-C': 2, 'F': 3, 'F-G': 4, 'G-F': 5, 'G': 6}
     offense = range(len(action.offense))
     for i in range(len(action.offense)):
         j = i
@@ -48,7 +41,40 @@ def arrange_by_position(action):
             defense[j] = defense[j - 1]
             j -= 1
         defense[j] = action.defense[i]
-
     action.offense = offense
     action.defense = defense
     return action
+
+
+def get_coords(coords, players):
+    ctk = []
+    for o in players:
+        for coord in coords:
+            if str(coord[1]) == str(o[0]):
+                ctk.append([coord[2], coord[3]])
+    return ctk
+
+
+def get_cannonical_position(action, time):
+    arrange_by_position(action)
+    ball = (action.coords[time][0][2], action.coords[time][0][3])
+    otk = get_coords(action.coords[time], action.offense)
+    hoop = (4.0, 25.0)
+    pos = []
+    for o in otk:
+        xpos = (0.62 * o[0]) + (0.11 * ball[0]) + (0.27 * hoop[0])
+        ypos = (0.62 * o[1]) + (0.11 * ball[1]) + (0.27 * hoop[1])
+        pos.append([xpos, ypos])
+    return pos
+
+
+def determine_matchup(action, time):
+    matrix = [[0] * 5] * 5
+    arrange_by_position(action)
+    deff = get_coords(action.coords[time], action.defense)
+    positions = get_cannonical_position(action, time)
+    for i, (px, py) in enumerate(positions):
+        a = [get_distance((px, py), (d[0], d[1])) for d in deff]
+        matrix[i][a.index(min(a))] = 1
+    # return matrix
+    raise Error("Not yet fully implemented.")

@@ -27,9 +27,9 @@ class TestPreprocessorFunctions(unittest.TestCase):
                    [202379, u'F', u'visitor', 1],
                    [101109, u'G', u'visitor', 1],
                    [200826, u'G', u'visitor', 1]])
-
-        self.assertEquals(str(arrange_by_position(action).offense), off)
-        self.assertEquals(str(arrange_by_position(action).defense), deff)
+        arrange_by_position(action)
+        self.assertEquals(str(action.offense), off)
+        self.assertEquals(str(action.defense), deff)
 
 
 if __name__ == '__main__':
