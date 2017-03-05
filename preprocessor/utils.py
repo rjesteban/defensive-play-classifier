@@ -1,5 +1,4 @@
 import math
-import numpy as np
 
 
 def get_distance(p1, p2):
@@ -16,7 +15,8 @@ def transform_wlog(action):
             y = e[3]
             if x > 47:
                 e[2] = round(94 - x, 4)
-            e[3] = round(50 - y, 4)
+            else:
+                e[3] = round(50 - y, 4)
         coordinates.append(entity)
     action.coords = coordinates
     return action
@@ -77,4 +77,4 @@ def determine_matchup(action, time):
         a = [get_distance((px, py), (d[0], d[1])) for d in deff]
         matrix[i][a.index(min(a))] = 1
     # return matrix
-    raise Error("Not yet fully implemented.")
+    raise Exception("Not yet fully implemented.")

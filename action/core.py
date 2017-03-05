@@ -38,7 +38,7 @@ class Action(object):
         context['label'] = self.label
         data = {str(context['eventid']): context}
         try:
-            with open(PATH + str(self.gameid) + '.json', 'w') as f:
+            with open(PATH + str(self.gameid) + '.json', 'r+') as f:
                 data = json.load(f)
                 data[str(context['eventid'])] = context
                 json.dump(data, f)
