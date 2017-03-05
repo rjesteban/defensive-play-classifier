@@ -17,7 +17,7 @@ if __name__ == '__main__':
     from segmenter.core import convert_moment_to_action
     from preprocessor.utils import transform_wlog
     testdata = json.load(open('data/sportvu/0021500582.json'))
-    eid = 30  # 4
+    eid = 4  # 30  # 4
     action = convert_moment_to_action(testdata, eid)
     action = transform_wlog(action)
     print action

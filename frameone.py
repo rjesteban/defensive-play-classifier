@@ -5,12 +5,14 @@ import matplotlib.image as mpimg
 import numpy as np
 
 
+frame = 320
+
 action = load_action("0021500582", 4)
 transform_wlog(action)
 moment = action.coords
 
-ball_xy = np.array([x[0][2:4] for x in moment][0])
-player_xy = np.array([np.array(x[1:])[:, 2:4] for x in moment][0])
+ball_xy = np.array([x[0][2:4] for x in moment][frame])
+player_xy = np.array([np.array(x[1:])[:, 2:4] for x in moment][frame])
 
 fig = plt.figure(figsize=(15, 7.5))
 ax = plt.gca()
@@ -37,7 +39,7 @@ dx = 5
 plt.xlim([0 - dx, 100 + dx])
 plt.ylim([0 - dx, 50 + dx])
 
-pos = get_cannonical_position(action, 0)
+pos = get_cannonical_position(action, frame)
 plt.plot([p[0] for p in pos], [p[1] for p in pos], 'o', color='g')
 
 plt.show()
