@@ -7,14 +7,12 @@ def count_matchup_over_time(gid="0021500582", eid=30):
     frames = len(action.coords)
 
     color_dict = {
-        0: 'y',
-        1: 'g',
-        2: 'c',
-        3: 'b',
-        4: 'r',
+        0: 'y',  # center
+        1: 'g',  # forward
+        2: 'c',  # forward
+        3: 'b',  # guard
+        4: 'r',  # guard
     }
-    # defended = [[], [], [], [], []]
-    # color = [[], [], [], [], []]
 
     import matplotlib.patches as mpatches
     import matplotlib.pyplot as plt
