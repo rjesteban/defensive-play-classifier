@@ -5,7 +5,7 @@ PATH = 'data/actions/'
 
 def load_action(gameid, eid):
     with open(PATH + str(gameid) + '.json') as f:
-            data = json.load(f)
+        data = json.load(f)
     ctx = data[str(eid)]
     a = Action(str(ctx['gameid']), ctx['eventid'], ctx['coords'],
                ctx['offense'], ctx['defense'], ctx['label'])
@@ -36,13 +36,13 @@ class Action(object):
         context['defense'] = self.defense
         context['gameid'] = self.gameid
         context['label'] = self.label
-        data = {str(context['eventid']): context}
         try:
-            with open(PATH + str(self.gameid) + '.json', 'r+') as f:
+            with open(PATH + str(self.gameid) + '.json', 'r') as f:
                 data = json.load(f)
+            with open(PATH + str(self.gameid) + '.json', 'w') as f:
                 data[str(context['eventid'])] = context
                 json.dump(data, f)
         except Exception:
             with open(PATH + str(self.gameid) + '.json', 'w') as f:
-                json.dump(data, f)
+                json.dump({str(context['eventid']): context}, f)
         return context

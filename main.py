@@ -13,13 +13,26 @@ if __name__ == '__main__':
         moments += pick_possessions('data/pbp/' + id + 'pbp.json')
     print len(moments)
     """
+
+    """
     import json
     from segmenter.core import convert_moment_to_action
-    from preprocessor.utils import transform_wlog
     testdata = json.load(open('data/sportvu/0021500582.json'))
     eid = 4  # 30  # 4
     action = convert_moment_to_action(testdata, eid)
-    action = transform_wlog(action)
     print action
     from visualizer.actionvisualizer import run
     run(eid=eid, act=action)
+    """
+
+    from action.core import load_action
+    from preprocessor.utils import determine_matchup
+    from frameone import run as fr_run
+    eid = 4
+    action = load_action("0021500582", eid)
+
+    from preprocessor.features import get_entropy
+    print get_entropy(action)
+
+    print determine_matchup(action, 0, "canonical")
+    fr_run(eid=eid)

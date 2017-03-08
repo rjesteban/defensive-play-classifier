@@ -1,6 +1,7 @@
 from action.core import Action
 from segmenter.utils import time_difference, all_on_one_side, within_the_paint
 from sportvu.utils import get_moment, determine_offs_defs
+from preprocessor.utils import transform_wlog
 import json
 
 PBP_PATH = 'data/pbp/'
@@ -74,5 +75,6 @@ def convert_moment_to_action(data, eid):
         offense = players['offense']
         defense = players['defense']
         action = Action(gameid, eid, frames, offense, defense, 0)
+        transform_wlog(action)
         action.save()
         return action

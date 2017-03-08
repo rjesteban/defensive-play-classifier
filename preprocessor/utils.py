@@ -1,4 +1,5 @@
 import math
+import numpy as np
 
 
 def get_distance(p1, p2):
@@ -48,9 +49,10 @@ def arrange_by_position(action):
 
 def get_coords(coords, players):
     ctk = []
-    for o in players:
+    for p in players:
         for coord in coords:
-            if str(coord[1]) == str(o[0]):
+            pid = coord[1]
+            if str(pid) == str(p[0]):
                 ctk.append([coord[2], coord[3]])
     return ctk
 
@@ -68,13 +70,15 @@ def get_cannonical_position(action, time):
     return pos
 
 
-def determine_matchup(action, time):
-    matrix = [[0] * 5] * 5
+def determine_matchup(action, time, by="distance"):
+    matrix = np.zeros((5, 5), dtype=np.float32)
     arrange_by_position(action)
-    deff = get_coords(action.coords[time], action.defense)
-    positions = get_cannonical_position(action, time)
+    defenders = get_coords(action.coords[time], action.defense)
+    if by == "distance":
+        positions = get_coords(action.coords[time], action.offense)
+    else:
+        positions = get_cannonical_position(action, time)
     for i, (px, py) in enumerate(positions):
-        a = [get_distance((px, py), (d[0], d[1])) for d in deff]
+        a = [get_distance((px, py), (d[0], d[1])) for d in defenders]
         matrix[i][a.index(min(a))] = 1
-    # return matrix
-    raise Exception("Not yet fully implemented.")
+    return matrix
