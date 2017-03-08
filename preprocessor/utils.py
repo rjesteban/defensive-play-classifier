@@ -75,10 +75,13 @@ def determine_matchup(action, time, by="distance"):
     arrange_by_position(action)
     defenders = get_coords(action.coords[time], action.defense)
     if by == "distance":
-        positions = get_coords(action.coords[time], action.offense)
+        offender_loc = get_coords(action.coords[time], action.offense)
     else:
-        positions = get_cannonical_position(action, time)
-    for i, (px, py) in enumerate(positions):
-        a = [get_distance((px, py), (d[0], d[1])) for d in defenders]
+        offender_loc = get_cannonical_position(action, time)
+
+    # defender rows
+    # offender cols
+    for i, (px, py) in enumerate(defenders):
+        a = [get_distance((px, py), (d[0], d[1])) for d in offender_loc]
         matrix[i][a.index(min(a))] = 1
     return matrix

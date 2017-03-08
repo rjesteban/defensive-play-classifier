@@ -25,6 +25,7 @@ if __name__ == '__main__':
     run(eid=eid, act=action)
     """
 
+    """
     from action.core import load_action
     from preprocessor.utils import determine_matchup
     from frameone import run as fr_run
@@ -36,3 +37,7 @@ if __name__ == '__main__':
 
     print determine_matchup(action, 0, "canonical")
     fr_run(eid=eid)
+    """
+
+    from eda.matchups import count_matchup_over_time
+    count_matchup_over_time()

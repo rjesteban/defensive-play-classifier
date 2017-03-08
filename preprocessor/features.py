@@ -17,12 +17,13 @@ def get_entropy(action):
     print entropy
     print "COUNT " * 10
 
-    for r in range(len(entropy)):
-        for c in range(len(entropy[0])):
+    for r in range(len(entropy)):  # defenders
+        for c in range(len(entropy[0])):  # offenders
             if entropy[r][c] > 0:
                 p = entropy[r][c] / float(length)
                 entropy[r][c] = -(p * math.log(p))
-                print  "r: " + str(r) + ", c:" + str(c) + " val:" +  str(p * math.log(p))
+    # print("r: " + str(r) + ", c:" +
+    # str(c) + " val:" +  str(p * math.log(p)))
     print "X" * 10 + "entropy" + "X" * 10
     print [sum(row) for row in entropy]
     print "X" * 10 + "entropy" + "X" * 10
