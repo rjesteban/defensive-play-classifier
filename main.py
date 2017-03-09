@@ -14,22 +14,22 @@ if __name__ == '__main__':
     print len(moments)
     """
 
-    """
+    # """
     import json
     from segmenter.core import convert_moment_to_action
     testdata = json.load(open('data/sportvu/0021500582.json'))
-    eid = 4  # 30  # 4
+    eid = 139  # 30  # 4
     action = convert_moment_to_action(testdata, eid)
     print action
     from visualizer.actionvisualizer import run
     run(eid=eid, act=action)
-    """
+    # """
 
-    """
+    # """
     from action.core import load_action
     from preprocessor.utils import determine_matchup
     from frameone import run as fr_run
-    eid = 4
+    eid = 139
     action = load_action("0021500582", eid)
 
     from preprocessor.features import get_entropy
@@ -37,7 +37,7 @@ if __name__ == '__main__':
 
     print determine_matchup(action, 0, "canonical")
     fr_run(eid=eid)
-    """
+    # """
 
     from eda.matchups import count_matchup_over_time
-    count_matchup_over_time()
+    count_matchup_over_time(eid=eid)
