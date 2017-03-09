@@ -69,6 +69,7 @@ def convert_moment_to_action(data, eid):
             inside_count = 0
             frames = []
     if len(frames) < 150:
+        print "Insufficient number of frames: " + str(len(frames))
         return None
     else:
         players = determine_offs_defs(data, gameid, eid)
