@@ -101,7 +101,7 @@ def run(eid=4, gid="0021500582", act=None):
 
     ani = animation.FuncAnimation(fig, animate,
                                   frames=np.arange(0, np.size(ball_xy, 0)),
-                                  init_func=init, blit=True,
+                                  init_func=init, blit=False,
                                   interval=5, repeat=False, save_count=0)
 
     ani.save('Action_%s_%d.mp4' % (gid, eid), dpi=100, fps=25)
