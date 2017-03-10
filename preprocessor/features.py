@@ -1,11 +1,12 @@
-import numpy as np
-from preprocessor.utils import determine_matchup
+from preprocessor.utils import determine_matchup, get_distance, get_coords
 import math
+import numpy as np
 
 
 distance = np.zeros((5, 5), dtype=np.int)
 
 
+# entropy for each defender
 def get_entropy(action):
     entropy = []
     length = len(action.coords)
@@ -13,25 +14,30 @@ def get_entropy(action):
         entropy.append(determine_matchup(action, i, "canonical"))
 
     entropy = sum(entropy)
-    print "COUNT " * 10
-    print entropy
-    print "COUNT " * 10
-
+    indices = [r.argmax() for r in entropy]
+    print indices
     for r in range(len(entropy)):  # defenders
         for c in range(len(entropy[0])):  # offenders
             if entropy[r][c] > 0:
                 p = entropy[r][c] / float(length)
-                entropy[r][c] = -(p * math.log(p))
-    # print("r: " + str(r) + ", c:" +
-    # str(c) + " val:" +  str(p * math.log(p)))
-    print "X" * 10 + "entropy" + "X" * 10
-    print [sum(row) for row in entropy]
-    print "X" * 10 + "entropy" + "X" * 10
-    return entropy
+                entropy[r][c] = -(p * math.log(p, 2))
+    return [sum(row) for row in entropy]
 
 
 def get_mean_distance(action):
-    raise Exception("Distance: Not yet Implemented")
+    matchup = []
+    length = len(action.coords)
+    for i in range(length):
+        matchup.append(determine_matchup(action, i, "canonical"))
+
+    match = [p.argmax() for p in sum(matchup)]
+    dist = range(5)
+    for time in range(length):
+        defenders = get_coords(action.coords[time], action.defense)
+        offenders = get_coords(action.coords[time], action.offense)
+        for d in range(5):  # defenders
+            dist[d] += get_distance(defenders[d], offenders[match[d]])
+    return [float(p) / length for p in dist]
 
 
 def get_number_passes(action):

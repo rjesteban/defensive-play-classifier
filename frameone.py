@@ -37,8 +37,7 @@ def run(eid=4):
     dx = 5
     plt.xlim([0 - dx, 100 + dx])
     plt.ylim([0 - dx, 50 + dx])
-
-    pos = get_cannonical_position(action, frame)
+    pos = get_cannonical_position(action, frame, by="cannonical")
     plt.plot([p[0] for p in pos], [p[1] for p in pos], 'o', color='g')
 
     plt.show()

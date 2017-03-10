@@ -70,7 +70,7 @@ def get_cannonical_position(action, time):
     return pos
 
 
-def determine_matchup(action, time, by="distance"):
+def determine_matchup(action, time, by):
     matrix = np.zeros((5, 5), dtype=np.float32)
     arrange_by_position(action)
     defenders = get_coords(action.coords[time], action.defense)
