@@ -48,7 +48,7 @@ def pick_possessions(gameid):
                      time_difference(row_set[i - 1][6], row_set[i][6]) < 5)
         attempt = (shot_attempt and not follow_up) or turnover  # or stop_play
         if attempt and not came_from_steal and not timeout:
-            moments.append(row_set[i])
+            moments.append(row_set[i][1])
             # print row_set[i][:2]
     return moments
 

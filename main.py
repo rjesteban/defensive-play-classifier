@@ -1,19 +1,28 @@
-# from segmenter import pick_possessions
+from segmenter.core import pick_possessions
 
 if __name__ == '__main__':
-    """
-    from playbyplay.utils import acquire_pbp_json
     ids = ['0021500316', '0021500270', '0021500149', '0021500197',
            '0021500428', '0021500350', '0021500336',
            '0021500476', '0021500582']
-    # ids = ['0021500582']
-    moments = []
 
-    for id in ids:
-        acquire_pbp_json(id)
-        # moments += pick_possessions('data/pbp/' + id + 'pbp.json')
-    print len(moments)
-    """
+
+    from playbyplay.utils import acquire_pbp_json
+    moments = {"0021500316": [],
+               "0021500270": [],
+               "0021500149": [],
+               "0021500197": [],
+               "0021500428": [],
+               "0021500350": [],
+               "0021500336": [],
+               "0021500476": [],
+               "0021500582": []
+              }
+
+    for gid in moments.keys():
+        for id in ids:
+            moments[gid] = pick_possessions(gid)
+        print gid + ": " + str(moments[gid])
+
 
     """
     import json
@@ -47,9 +56,3 @@ if __name__ == '__main__':
 
     # fr_run(eid=eid)
     # """
-
-    # canonical = 0.423526057228446
-    # distance  = 0.72332673966884609
-
-    from eda.matchups import count_matchup_over_time
-    # count_matchup_over_time(eid=eid, by="canonical")
