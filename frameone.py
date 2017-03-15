@@ -3,8 +3,6 @@ from preprocessor.utils import get_cannonical_position
 import matplotlib.pyplot as plt
 import matplotlib.image as mpimg
 import numpy as np
-
-
 def run(eid=4):
     frame = 0
 
@@ -39,5 +37,4 @@ def run(eid=4):
     plt.ylim([0 - dx, 50 + dx])
     pos = get_cannonical_position(action, frame, by="cannonical")
     plt.plot([p[0] for p in pos], [p[1] for p in pos], 'o', color='g')
-
     plt.show()

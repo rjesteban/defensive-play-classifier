@@ -32,10 +32,15 @@ for gid in zonedefs.keys():
 """
 
 
-gid = "0021500350"
-with open(SPORTVU_PATH + gid + '.json') as sportvu:
-    data = json.load(sportvu)
-
-for eid in zonedefs[gid]:
-    action = convert_moment_to_action(data, eid, check_frames=False)
-    run(eid=eid, gid=gid, act=action)
+# gid = "0021500350"
+for gid in zonedefs.keys():
+    with open(SPORTVU_PATH + str(gid) + '.json') as sportvu:
+        data = json.load(sportvu)
+    for eid in zonedefs[gid]:
+        try:
+            action = convert_moment_to_action(data, eid, check_frames=False)
+            action.label = -1
+            action.save()
+            run(eid=eid, gid=gid, act=action)
+        except Exception:
+            print "gid: " + str(gid) +  " | eid: " + str(eid)

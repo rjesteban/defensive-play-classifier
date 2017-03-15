@@ -71,8 +71,10 @@ def convert_moment_to_action(data, eid, check_frames=True):
     if check_frames and len(frames) < 150:
             print "Insufficient number of frames: " + str(len(frames))
             return None
-    print "FRAMES: " + str(frames)
-    print "EID: " + str(eid)
+    # print "FRAMES: " + str(frames)
+    # print "EID: " + str(eid)
+    if len(frames) == 0:
+        raise Exception("Not an action.")
     players = determine_offs_defs(data, gameid, eid)
     offense = players['offense']
     defense = players['defense']
