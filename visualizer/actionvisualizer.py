@@ -14,7 +14,7 @@ matplotlib.use('TKAgg')
 mpl.rcParams['font.family'] = ['Bitstream Vera Sans']
 
 
-def run(eid=4, gid="0021500582", act=None):
+def run(eid, gid, act=None):
     # this is what matplotlib's animation will create before drawing the first
     # frame.
     def draw_court(axis):
@@ -72,6 +72,7 @@ def run(eid=4, gid="0021500582", act=None):
     pos = [str(p[1]) for p in players]
     ids = [str(p[0]) for p in players]
     jerseydict = dict(zip(ids, pos))
+
     ball_xy = np.array([x[0][2:5] for x in moment])
     player_xy = np.array([np.array(x[1:])[:, 1:4] for x in moment])
     #  ==============================ANIMATION=================

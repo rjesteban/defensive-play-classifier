@@ -16,7 +16,7 @@ mpl.rcParams['font.family'] = ['Bitstream Vera Sans']
 
 
 # import the data from wherever you saved it.
-json_data = open('data/sportvu/0021500582.json')
+json_data = open('data/sportvu/0021500350.json')
 data = json.load(json_data)  # load the data
 
 
@@ -115,7 +115,7 @@ def init():
 
 # the order of events does not match up, so we have to use the eventIds.
 # This loop finds the correct event for a given id# .
-search_id = 4
+search_id = 389
 
 
 def find_moment(search_id):

@@ -34,17 +34,7 @@ def get_pbp(id):
 
 
 def find_index(data, eid):
-    index = eid
-    diff = eid - int(data['resultSets'][0]['rowSet'][index][1])
-    if diff == 0:
-        return index
-    if diff > 0:
-        while (diff > 0):
-            diff = eid - int(data['resultSets'][0]['rowSet'][index][1])
-            index += 1
-        return index - 1
-    else:
-        while(diff < 0):
-            diff = eid - int(data['resultSets'][0]['rowSet'][index][1])
-            index -= 1
-        return index + 1
+    for index, row in enumerate(data['resultSets'][0]['rowSet']):
+        if str(row[1]) == str(eid):
+            return index
+    raise Exception("Index not found")

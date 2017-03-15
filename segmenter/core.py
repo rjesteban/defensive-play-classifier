@@ -54,7 +54,7 @@ def pick_possessions(gameid):
 
 
 # Rule based algorithm
-def convert_moment_to_action(data, eid):
+def convert_moment_to_action(data, eid, check_frames=True):
     moment = get_moment(data, eid)
     gameid = str(data['gameid'])
     frames = []
@@ -68,14 +68,15 @@ def convert_moment_to_action(data, eid):
         else:
             inside_count = 0
             frames = []
-    if len(frames) < 150:
-        print "Insufficient number of frames: " + str(len(frames))
-        return None
-    else:
-        players = determine_offs_defs(data, gameid, eid)
-        offense = players['offense']
-        defense = players['defense']
-        action = Action(gameid, eid, frames, offense, defense, 0)
-        transform_wlog(action)
-        action.save()
-        return action
+    if check_frames and len(frames) < 150:
+            print "Insufficient number of frames: " + str(len(frames))
+            return None
+    print "FRAMES: " + str(frames)
+    print "EID: " + str(eid)
+    players = determine_offs_defs(data, gameid, eid)
+    offense = players['offense']
+    defense = players['defense']
+    action = Action(gameid, eid, frames, offense, defense, 0)
+    transform_wlog(action)
+    action.save()
+    return action

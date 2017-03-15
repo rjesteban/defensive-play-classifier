@@ -6,20 +6,10 @@ def get_moment(data, eid):
 
 
 def find_index(data, eid):
-    index = eid
-    diff = eid - int(data['events'][eid]['eventId'])
-    if diff == 0:
-        return index
-    if diff > 0:
-        while (diff > 0):
-            diff = eid - int(data['events'][index]['eventId'])
-            index += 1
-        return index - 1
-    else:
-        while(diff < 0):
-            diff = eid - int(data['events'][index]['eventId'])
-            index -= 1
-        return index + 1
+    for index, events in enumerate(data['events']):
+        if events['eventId'] == str(eid):
+            return index
+    raise Exception("Index not found")
 
 
 def get_playersoncourt(data, eid, side='home'):
@@ -39,7 +29,8 @@ def contains(event, num, word):
 
 def determine_offs_defs(data, gameid, eid):
     pbp = pbputil.get_pbp(str(gameid))
-    event = pbp['resultSets'][0]['rowSet'][pbputil.find_index(pbp, eid)]
+    pbpindex = pbputil.find_index(pbp, eid)
+    event = pbp['resultSets'][0]['rowSet'][pbpindex]
     if (event[2] in [1, 2] and event[7] is not None and
        ('Shot' or 'MISS' in str(event[7])) or
        event[2] == 5 and contains(event, 7, 'Turnover') or
