@@ -20,6 +20,10 @@ zonedefs = {"0021500149": [],
             "0021500040": [117]
             }
 
+
+mandefs = {}
+
+
 """
 for gid in zonedefs.keys():
     with open(SPORTVU_PATH + gid + '.json') as sportvu:
