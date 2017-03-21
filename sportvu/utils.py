@@ -13,12 +13,28 @@ def find_index(data, eid):
 
 
 def get_playersoncourt(data, eid, side='home'):
+    """
+        returns players (ID, position, side, quarter) on court
+        raises Exception if in that event there are more
+        than or less than 11 PIDs
+    """
+    players = []
     index = find_index(data, eid)
     if side != 'home':
         side = 'visitor'
     p_dict = data['events'][index][side]['players']
     qtr = data['events'][index]['moments'][0][0]
-    oncourt = [p[1] for p in data['events'][index]['moments'][0][5]]
+    for frame in data['events'][index]['moments']:
+        oncourt = [p[1] for p in frame[5]]
+        if len(oncourt) != 11:
+            raise Exception("Inconsistent number of players" +
+                            " detected per frame")
+        players += oncourt
+
+    oncourt = set(players)
+    if len(oncourt) != 11:
+        raise Exception("Some sort of substitution happened in this event")
+    # oncourt = [p[1] for p in data['events'][index]['moments'][0][5]]
     return ([[p['playerid'], str(p['position']), side, qtr]
             for p in p_dict if p['playerid'] in oncourt])
 

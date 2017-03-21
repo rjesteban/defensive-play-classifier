@@ -3,7 +3,9 @@ from preprocessor.utils import get_cannonical_position
 import matplotlib.pyplot as plt
 import matplotlib.image as mpimg
 import numpy as np
-def run(eid=4):
+
+
+def run(eid):
     frame = 0
 
     action = load_action("0021500582", eid)

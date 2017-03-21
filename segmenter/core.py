@@ -49,7 +49,6 @@ def pick_possessions(gameid):
         attempt = (shot_attempt and not follow_up) or turnover  # or stop_play
         if attempt and not came_from_steal and not timeout:
             moments.append(row_set[i][1])
-            # print row_set[i][:2]
     return moments
 
 
@@ -69,10 +68,8 @@ def convert_moment_to_action(data, eid, check_frames=True):
             inside_count = 0
             frames = []
     if check_frames and len(frames) < 150:
-            print "Insufficient number of frames: " + str(len(frames))
-            return None
-    # print "FRAMES: " + str(frames)
-    # print "EID: " + str(eid)
+            raise Exception("Insufficient number of frames: " +
+                            str(len(frames)))
     if len(frames) == 0:
         raise Exception("Not an action.")
     players = determine_offs_defs(data, gameid, eid)
