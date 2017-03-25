@@ -77,13 +77,13 @@ def visualize(gameid, eventid, label):
     def animate(n):
         for i, ii in enumerate(player_xy[n]):  # loop through all the players
             # change each players xy position
-            player_circ[i].center = (ii[1], ii[2])
+            player_circ[i].center = (ii[1], 50 - ii[2])
             # draw the text for each player.
             player_text[i].set_text(str(jerseydict[ii[0]]))
             player_text[i].set_x(ii[1])  # set the text x position
-            player_text[i].set_y(ii[2])  # set text y position
+            player_text[i].set_y(50 - ii[2])  # set text y position
         # change ball xy position
-        ball_circ.center = (ball_xy[n, 0], ball_xy[n, 1])
+        ball_circ.center = (ball_xy[n, 0], 50 - ball_xy[n, 1])
         # i could change the size of the ball according to its height,
         # but chose to keep this constant
         ball_circ.radius = 1.1
