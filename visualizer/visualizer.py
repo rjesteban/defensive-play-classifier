@@ -144,13 +144,13 @@ def visualize(gameid, eventid, label):
         # player jersey  #  (text)
         player_text[i] = ax.text(0, 0, '', color=col[1],
                                  ha='center', va='center')
-    frame_text = ax.annotate('', xy=[50, 50],
+    frame_text = ax.annotate('', xy=[50, 52],
                              color='black', horizontalalignment='center',
                              verticalalignment='center')
 
     ani = animation.FuncAnimation(fig, animate,
                                   frames=np.arange(0, np.size(ball_xy, 0)),
-                                  init_func=init, blit=True,
+                                  init_func=init, blit=False,
                                   interval=5, repeat=False, save_count=0)
 
     folder = "zone" if label == -1 else "man"

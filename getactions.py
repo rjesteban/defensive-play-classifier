@@ -77,8 +77,9 @@ for gid in sorted(mandefs.keys()):
     for eid in (mandefs[gid] + zonedefs[gid]):
         try:
             visualize(gid, eid, -1 if eid in zonedefs[gid] else 1)
+            print "DONE: " + str(gid) + " " + str(eid)
         except Exception:
-            print "gid: " + str(gid) + " | eid: " + str(eid)
+            print " gid: " + str(gid) + " | eid: " + str(eid)
 
 """
 actions = []
