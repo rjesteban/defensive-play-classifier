@@ -12,6 +12,7 @@ import matplotlib
 matplotlib.use('TKAgg')
 
 mpl.rcParams['font.family'] = ['Bitstream Vera Sans']
+PATH = "data/videos/"
 
 
 def run(eid, gid, act=None):
@@ -105,5 +106,8 @@ def run(eid, gid, act=None):
                                   init_func=init, blit=False,
                                   interval=5, repeat=False, save_count=0)
 
-    ani.save('Action_%s_%d.mp4' % (gid, eid), dpi=100, fps=25)
+    if action.label == -1:
+        ani.save(PATH + 'Zone/Action_%s_%d.mp4' % (gid, eid), dpi=100, fps=25)
+    else:
+        ani.save(PATH + 'Man/Action_%s_%d.mp4' % (gid, eid), dpi=100, fps=25)
     plt.close('all')
