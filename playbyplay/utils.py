@@ -35,6 +35,12 @@ def get_pbp(id):
 
 def find_index(data, eid):
     for index, row in enumerate(data['resultSets'][0]['rowSet']):
-        if str(row[1]) == str(eid):
+        if str(int(row[1])) == str(int(eid)):
             return index
     raise Exception("Index not found")
+
+
+def get_play(gid, eid):
+    data = get_pbp(gid)
+    index = find_index(data, eid)
+    return data['resultSets'][0]['rowSet'][index]
