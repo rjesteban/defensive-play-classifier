@@ -2,6 +2,14 @@ import math
 import numpy as np
 
 
+def determine_matchup_over_time(action):
+    matchup = []
+    length = len(action.coords)
+    for i in range(length):
+        matchup.append(determine_matchup(action, i, "cannonical"))
+    return matchup
+
+
 def get_distance(p1, p2):
     sidex = math.fabs(p1[0] - p2[0])
     sidey = math.fabs(p1[1] - p2[1])
