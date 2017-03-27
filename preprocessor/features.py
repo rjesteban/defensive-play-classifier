@@ -1,4 +1,5 @@
-from preprocessor.utils import determine_matchup, get_distance, get_coords
+from preprocessor.utils import (determine_matchup, get_distance,
+                                get_coords, get_cannonical_position)
 import math
 import numpy as np
 
@@ -14,8 +15,6 @@ def get_entropy(action):
         entropy.append(determine_matchup(action, i, "canonical"))
 
     entropy = sum(entropy)
-    indices = [r.argmax() for r in entropy]
-    print indices
     for r in range(len(entropy)):  # defenders
         for c in range(len(entropy[0])):  # offenders
             if entropy[r][c] > 0:
@@ -35,6 +34,23 @@ def get_mean_distance(action):
     for time in range(length):
         defenders = get_coords(action.coords[time], action.defense)
         offenders = get_coords(action.coords[time], action.offense)
+        for d in range(5):  # defenders
+            dist[d] += get_distance(defenders[d], offenders[match[d]])
+    return [float(p) / length for p in dist]
+
+
+def get_mean_distance_from_cannonical_position(action):
+    matchup = []
+    length = len(action.coords)
+    for i in range(length):
+        matchup.append(determine_matchup(action, i, "canonical"))
+
+    match = [p.argmax() for p in sum(matchup)]
+    dist = range(5)
+    for time in range(length):
+        defenders = get_coords(action.coords[time], action.defense)
+        # offenders = get_coords(action.coords[time], action.offense)
+        offenders = get_cannonical_position(action, time)
         for d in range(5):  # defenders
             dist[d] += get_distance(defenders[d], offenders[match[d]])
     return [float(p) / length for p in dist]
