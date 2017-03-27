@@ -39,8 +39,30 @@ mandefs = {"0021500149": [33, 90, 97, 137, 157, 188, 200, 205, 206,
            }
 
 """
-print str("*" * 30) + " ZONE DEFENSE " + str("*" * 30)
+length = 0
+for key in zonedefs.keys():
+    length += len(zonedefs[key] + mandefs[key])
 
+print "LENGTH " + str(length)
+"""
+
+"""
+print str("*" * 30) + " ZONE DEFENSE " + str("*" * 30)
+gid = "0021500197"
+with open(SPORTVU_PATH + gid + '.json') as sportvu:
+    data = json.load(sportvu)
+    eid = 383
+    # try:
+    action = convert_moment_to_action(data, eid, check_frames=False)
+    action.label = -1
+    action.save()
+    run(eid=eid, gid=gid, act=action)
+    except Exception:
+        print "gid: " + str(gid) + " | eid: " + str(eid)
+"""
+
+
+print str("*" * 30) + " ZONE DEFENSE " + str("*" * 30)
 for gid in sorted(zonedefs.keys()):
     with open(SPORTVU_PATH + str(gid) + '.json') as sportvu:
         data = json.load(sportvu)
@@ -52,11 +74,9 @@ for gid in sorted(zonedefs.keys()):
             run(eid=eid, gid=gid, act=action)
         except Exception:
             print "gid: " + str(gid) + " | eid: " + str(eid)
-"""
 
-"""
+
 print str("*" * 30) + " MAN TO MAN " + str("*" * 30)
-
 for gid in sorted(mandefs.keys()):
     with open(SPORTVU_PATH + str(gid) + '.json') as sportvu:
         data = json.load(sportvu)
@@ -70,7 +90,6 @@ for gid in sorted(mandefs.keys()):
             print "gid: " + str(gid) + " | eid: " + str(eid)
 
 """
-
 for gid in sorted(mandefs.keys()):
     with open(SPORTVU_PATH + str(gid) + '.json') as sportvu:
         data = json.load(sportvu)
@@ -80,6 +99,8 @@ for gid in sorted(mandefs.keys()):
             print "DONE: " + str(gid) + " " + str(eid)
         except Exception:
             print " gid: " + str(gid) + " | eid: " + str(eid)
+"""
+
 
 """
 actions = []

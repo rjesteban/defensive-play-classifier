@@ -1,7 +1,9 @@
 from action.core import Action
-from segmenter.utils import time_difference, all_on_one_side, within_the_paint
-from sportvu.utils import get_moment, determine_offs_defs
+from segmenter.utils import (time_difference, all_on_one_side,
+                             within_the_paint, less_than)
 from preprocessor.utils import transform_wlog
+from playbyplay.utils import get_play
+from sportvu.utils import get_moment, determine_offs_defs
 import json
 
 PBP_PATH = 'data/pbp/'
@@ -54,24 +56,38 @@ def pick_possessions(gameid):
 
 # Rule based algorithm
 def convert_moment_to_action(data, eid, check_frames=True):
+    play = get_play(str(data['gameid']), eid)
+    end_time = play[6]
+    end_min = int(end_time.split(':')[0])
+    end_sec = int(end_time.split(':')[1])
     moment = get_moment(data, eid)
     gameid = str(data['gameid'])
     frames = []
+    prev_frames = []
     inside_count = 0
     for fr, frame in enumerate(moment):
         ball = moment[fr][5][0]
+        mins = int(moment[fr][2] / 60)
+        secs = int(((moment[fr][2] / 60.0) - mins) * 60)
+        # print "Time remaining: " + str(mins) + ":" + str(secs)
+        if less_than(mins, secs, end_min, end_sec - 2):
+            break
         if all_on_one_side(moment, eid, fr):
             if within_the_paint(ball, eid):
                 inside_count += 1
             frames.append(frame)
+        elif less_than(mins, secs, end_min, end_sec):
+            break
         else:
+            if len(frames) != 0:
+                prev_frames = frames
             inside_count = 0
             frames = []
     if check_frames and len(frames) < 150:
             raise Exception("Insufficient number of frames: " +
                             str(len(frames)))
     if len(frames) == 0:
-        raise Exception("Not an action.")
+        frames = prev_frames
     players = determine_offs_defs(data, gameid, eid)
     offense = players['offense']
     defense = players['defense']

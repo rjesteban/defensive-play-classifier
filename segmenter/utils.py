@@ -21,3 +21,10 @@ def within_the_paint(entity, eid):
     x, y = entity[2], entity[3]
     return (0 <= x <= 19 or (94 - 19) <= x <= 94 and
             (25 - 12) <= y <= (25 + 12))
+
+
+# min1 sec1 less than min2 step2
+def less_than(min1, sec1, min2, step2):
+    if min1 < min2:
+        return True
+    return min1 == min2 and sec1 < step2

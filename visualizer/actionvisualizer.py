@@ -36,8 +36,10 @@ def run(eid, gid, act=None):
         plt.xlim([0 - dx, 100 + dx])  # set axis
         plt.ylim([0 - dx, 50 + dx])
         frame_text.set_text('0')
+        time_text.set_text("MM:SS")
         return (tuple(player_text) + tuple(player_circ) +
-                (ball_circ,) + (frame_text,) + tuple(covariates))
+                (ball_circ,) + (frame_text,) +
+                (time_text,) + tuple(covariates))
 
     def animate(n):
         for i, ii in enumerate(player_xy[n]):  # loop through all the players
@@ -56,10 +58,15 @@ def run(eid, gid, act=None):
         # to keep this constant
         ball_circ.radius = 1.1
         frame_text.set_text(str(n))
-        frame_text.set_x(10)
-        frame_text.set_y(10)
+        frame_text.set_x(50)
+        frame_text.set_y(52)
+
+        time_text.set_text(str(time[n]))
+        time_text.set_x(60)
+        time_text.set_y(52)
         return (tuple(player_text) + tuple(player_circ) +
-                (ball_circ,) + (frame_text,) + tuple(covariates))
+                (ball_circ,) + (frame_text,) +
+                (time_text,) + tuple(covariates))
 
     # the order of events does not match up, so we have to use the eventIds.
     # This loop finds the correct event for a given id# .
@@ -76,6 +83,7 @@ def run(eid, gid, act=None):
 
     ball_xy = np.array([x[0][2:5] for x in moment])
     player_xy = np.array([np.array(x[1:])[:, 1:4] for x in moment])
+    time = np.array([t for t in action.time])
     #  ==============================ANIMATION=================
 
     fig = plt.figure(figsize=(15, 7.5))  # create figure object
@@ -98,8 +106,10 @@ def run(eid, gid, act=None):
     for i in range(5):
         covariates[i] = plt.Circle(
             (0, 0), 1.0, facecolor='g', edgecolor='k')  # player circle
-    frame_text = ax.annotate('', xy=[10, 10],
+    frame_text = ax.annotate('', xy=[50, 52],
                              color='black', ha='center', va='center')
+    time_text = ax.annotate('', xy=[60, 52],
+                            color='black', ha='center', va='center')
 
     ani = animation.FuncAnimation(fig, animate,
                                   frames=np.arange(0, np.size(ball_xy, 0)),

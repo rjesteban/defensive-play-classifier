@@ -88,8 +88,8 @@ def visualize(gameid, eventid, label):
         # but chose to keep this constant
         ball_circ.radius = 1.1
         frame_text.set_text(str(n))
-        frame_text.set_x(10)
-        frame_text.set_y(10)
+        frame_text.set_x(50)
+        frame_text.set_y(52)
         return (tuple(player_text) + tuple(player_circ) +
                 (ball_circ,) + (frame_text,))
 
