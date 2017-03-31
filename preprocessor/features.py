@@ -85,9 +85,10 @@ def get_mean_distance_from_cannonical_position(action):
 
 def get_time_defending(action):
     matchup = determine_matchup_over_time(action)[25:-25]
-    length = len(matchup)
     match = [p.argmax() for p in matchup[25]]
-    return [sum(matchup[25:-25])[index][d] for index, d in enumerate(match)]
+    defending = get_mean_distance_from_cannonical_position(action)
+    return [float(defending[d] / sum(matchup[25:-25])[index][d])
+            for index, d in enumerate(match)]
 
 
 def get_number_passes(action):
