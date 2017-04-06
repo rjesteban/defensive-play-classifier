@@ -1,7 +1,7 @@
 from fastdtw import fastdtw
 from preprocessor.utils import (determine_matchup_over_time, get_distance,
                                 get_coords, get_cannonical_position,
-                                determine_matchup)
+                                determine_matchup, arrange_by_position)
 from scipy.spatial.distance import euclidean
 import math
 import numpy as np
@@ -87,12 +87,25 @@ def get_time_defending(action):
     matchup = determine_matchup_over_time(action)[25:-25]
     match = [p.argmax() for p in matchup[25]]
     defending = get_mean_distance_from_cannonical_position(action)
-    return [float(defending[d] / sum(matchup[25:-25])[index][d])
+    # return [float(defending[d] / sum(matchup[25:-25])[index][d])
+    #         for index, d in enumerate(match)]
+	return [float(defending[d] * float(sum(matchup[25:-25])[index][d] / len(matchup)))
             for index, d in enumerate(match)]
-
 
 def get_number_passes(action):
     raise Exception("Passes: Not yet Implemented")
+
+
+def get_distance_from_post(action):
+    length = len(action.coords)
+    arrange_by_position(action)
+    defenders = [get_coords(action.coords[time], action.defense) for time in range(length)][25:-25]
+    post = defenders[0]
+    dist_from_post = [0 for r in range(5)]
+    for coords in defenders:
+        for d in range(5):
+            dist_from_post[d] += get_distance(coords[d], post[d])
+    return [float(p) / len(defenders) for p in dist_from_post]
 
 
 """
