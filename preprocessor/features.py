@@ -21,6 +21,7 @@ def get_entropy(action):
                 entropy[r][c] = -(p * math.log(p, 2))
     return [sum(row) for row in entropy]
 
+
 """
 # entropy for each defender
 def get_entropy(action):
@@ -41,7 +42,6 @@ def get_entropy(action):
 
 def get_DTW(action):
     matchup = determine_matchup_over_time(action)
-    length = len(matchup)
     initial_matchup = [p.argmax() for p in matchup[25]]
     defs = [[] for r in range(5)]
     offs = [[] for r in range(5)]
@@ -89,8 +89,10 @@ def get_time_defending(action):
     defending = get_mean_distance_from_cannonical_position(action)
     # return [float(defending[d] / sum(matchup[25:-25])[index][d])
     #         for index, d in enumerate(match)]
-	return [float(defending[d] * float(sum(matchup[25:-25])[index][d] / len(matchup)))
+    return [float(defending[d] *
+            float(sum(matchup[25:-25])[index][d] / len(matchup)))
             for index, d in enumerate(match)]
+
 
 def get_number_passes(action):
     raise Exception("Passes: Not yet Implemented")
@@ -99,7 +101,8 @@ def get_number_passes(action):
 def get_distance_from_post(action):
     length = len(action.coords)
     arrange_by_position(action)
-    defenders = [get_coords(action.coords[time], action.defense) for time in range(length)][25:-25]
+    defenders = [get_coords(action.coords[time], action.defense)
+                 for time in range(length)][25:-25]
     post = defenders[0]
     dist_from_post = [0 for r in range(5)]
     for coords in defenders:
