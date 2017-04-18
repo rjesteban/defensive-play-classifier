@@ -70,14 +70,12 @@ def convert_moment_to_action(data, eid, check_frames=True, label=0):
         mins = int(moment[fr][2] / 60)
         secs = int(((moment[fr][2] / 60.0) - mins) * 60)
         # print "Time remaining: " + str(mins) + ":" + str(secs)
-        if less_than(mins, secs, end_min, end_sec - 2):
+        if less_than(mins, secs, end_min, end_sec):
             break
         if all_on_one_side(moment, eid, fr):
             if within_the_paint(ball, eid):
                 inside_count += 1
             frames.append(frame)
-        elif less_than(mins, secs, end_min, end_sec):
-            break
         else:
             if len(frames) != 0:
                 prev_frames = frames
