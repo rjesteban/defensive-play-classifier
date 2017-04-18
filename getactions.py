@@ -68,8 +68,8 @@ for gid in sorted(zonedefs.keys()):
         data = json.load(sportvu)
     for eid in zonedefs[gid]:
         try:
-            action = convert_moment_to_action(data, eid, check_frames=False)
-            action.label = -1
+            action = convert_moment_to_action(data, eid,
+                                              check_frames=False, label=-1)
             action.save()
             run(eid=eid, gid=gid, act=action)
         except Exception:
@@ -82,8 +82,8 @@ for gid in sorted(mandefs.keys()):
         data = json.load(sportvu)
     for eid in mandefs[gid]:
         try:
-            action = convert_moment_to_action(data, eid, check_frames=False)
-            action.label = 1
+            action = convert_moment_to_action(data, eid,
+                                              check_frames=False, label=1)
             action.save()
             run(eid=eid, gid=gid, act=action)
         except Exception:

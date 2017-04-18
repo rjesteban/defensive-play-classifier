@@ -1,6 +1,6 @@
 from action.core import Action
 from segmenter.utils import (time_difference, all_on_one_side,
-                             within_the_paint, less_than)
+                             within_the_paint, less_than, format_time)
 from preprocessor.utils import transform_wlog
 from playbyplay.utils import get_play
 from sportvu.utils import get_moment, determine_offs_defs
@@ -55,7 +55,7 @@ def pick_possessions(gameid):
 
 
 # Rule based algorithm
-def convert_moment_to_action(data, eid, check_frames=True):
+def convert_moment_to_action(data, eid, check_frames=True, label=0):
     play = get_play(str(data['gameid']), eid)
     end_time = play[6]
     end_min = int(end_time.split(':')[0])
@@ -91,7 +91,12 @@ def convert_moment_to_action(data, eid, check_frames=True):
     players = determine_offs_defs(data, gameid, eid)
     offense = players['offense']
     defense = players['defense']
-    action = Action(gameid, eid, frames, offense, defense, 0)
+    coords = [coord[5] for coord in frames]
+    quarter = frames[0][0]
+    the_time = [format_time(time[2]) for time in frames]
+    action = Action(gameid=gameid, eid=eid, coords=coords,
+                    time=the_time, quarter=quarter,
+                    offense=offense, defense=defense, label=label)
     transform_wlog(action)
     action.save()
     return action

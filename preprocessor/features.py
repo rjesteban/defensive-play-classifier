@@ -111,6 +111,19 @@ def get_distance_from_post(action):
     return [float(p) / len(defenders) for p in dist_from_post]
 
 
+# average speed = distance moved / time taken
+def get_average_speed(action):
+    length = len(action.coords)
+    arrange_by_position(action)
+    defenders = [get_coords(action.coords[time], action.defense)
+                 for time in range(length)][25:-25]
+    dist = [0 for r in range(5)]
+    for index, coords in enumerate(defenders):
+        for d in range(5):
+            dist[d] += get_distance(coords[d], defenders[index - 1][d])
+    return [float(p) / len(defenders) for p in dist]
+
+
 """
 import numpy as np
 from scipy.spatial.distance import euclidean

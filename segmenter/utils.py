@@ -28,3 +28,11 @@ def less_than(min1, sec1, min2, step2):
     if min1 < min2:
         return True
     return min1 == min2 and sec1 < step2
+
+
+def format_time(time):
+    if isinstance(time, list):
+        time = 1
+    mins = int(time / 60)
+    secs = int(((time / 60.0) - mins) * 60)
+    return str(mins).zfill(2) + ':' + str(secs).zfill(2)
