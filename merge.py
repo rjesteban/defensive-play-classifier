@@ -67,9 +67,12 @@ merged_mans = {"0021500149": [],
 for game in sorted(mandefs1.keys()):
     merged_mans[game] = sorted(set(mandefs1[game] + mandefs2[game]))
 
+print "mandefs = {"
 
 for game in sorted(mandefs1.keys()):
     print '"' + game + '" : ' + str(merged_mans[game])
+
+print "}"
 
 
 examples = 0
