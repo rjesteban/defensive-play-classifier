@@ -14,11 +14,11 @@ matplotlib.use('TKAgg')
 
 mpl.rcParams['font.family'] = ['Bitstream Vera Sans']
 
-
-def visualize(gameid, eventid, label):
+# data = json opened already
+def visualize(data, eventid, label):
     # import the data from wherever you saved it.
-    json_data = open('data/sportvu/' + gameid + '.json')
-    data = json.load(json_data)  # load the data
+    # json_data = open('data/sportvu/' + gameid + '.json')
+    # data = json.load(json_data)  # load the data
 
     def acquire_gameData(data):
         import requests
@@ -154,6 +154,7 @@ def visualize(gameid, eventid, label):
                                   interval=5, repeat=False, save_count=0)
 
     folder = "zone" if label == -1 else "man"
-    ani.save('data/videos/events/%s/%s_%d.mp4' % (folder, gameid, search_id),
-             dpi=100, fps=25)
+    # instead of gameid, get data['gameid']
+    ani.save('data/videos/events/%s/%s_%d.mp4' % (folder, data['gameid'],
+             search_id), dpi=100, fps=25)
     plt.close('all')
