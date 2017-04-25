@@ -115,4 +115,5 @@ print "failed: " + str(failed_man) + "/" + str(passed_man + failed_man)
 
 print ""
 print " TOTAL: "
-print str(passed_man + passed_zone) + "/" + str(failed_man + failed_zone)
+print str(passed_man + passed_zone) + "/" + str(failed_man + failed_zone +
+                                                passed_man + passed_zone)
