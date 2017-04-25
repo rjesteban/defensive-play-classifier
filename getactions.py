@@ -1,6 +1,5 @@
 from visualizer.actionvisualizer import run
 from segmenter.core import convert_moment_to_action
-from visualizer.visualizer import visualize
 import json
 
 
@@ -21,7 +20,42 @@ zonedefs = {"0021500149": [364, 375, 381, 392, 404],
                            138, 328, 343, 346, 364, 407, 411, 510],
             }
 
+mandefs = {"0021500149" : [2, 4, 7, 15, 32, 33, 40, 41, 52, 62, 67, 72, 82,
+                           90, 95, 97, 110, 112, 118, 126, 135, 137, 150, 157,
+                           188, 198, 200, 202, 205, 206, 208, 215, 216, 222,
+                           224, 237, 249, 269, 279, 285, 294, 296, 298, 312,
+                           314, 328, 333, 342, 382, 390, 396, 409, 422, 425,
+                           428, 433, 434, 436, 440, 445, 446, 449, 473, 475,
+                           477, 499, 500, 527, 540, 550, 555],
+          "0021500197" : [],
+          "0021500270" : [410, 422, 426, 427, 428, 474, 477, 496, 514,
+                          518, 545, 547, 556],
+          "0021500316" : [2, 13, 22, 89, 90, 136, 139, 141, 164, 166, 169,
+                          170, 173, 176, 183, 187, 188, 190, 254, 255, 257,
+                          264, 314, 343, 372, 381, 406, 411, 415, 420, 425,
+                          430, 432, 443, 483],
+          "0021500350" : [410, 485, 493, 520],
+          "0021500428" : [3, 14, 24, 29, 43, 53, 60, 65, 73, 81, 86, 100, 103,
+                          116, 119, 123, 130, 133, 167, 179, 185, 197, 202,
+                          203, 219, 221, 223, 246, 261, 264, 268, 278, 281,
+                          284, 298, 305, 306, 308, 316, 328, 340, 341, 346,
+                          351, 355, 359, 367, 372, 373, 409, 414, 428, 436,
+                          457, 467, 473, 474, 482, 488, 493, 499, 520],
+          "0021500476" : [2, 7, 9, 16, 19, 26, 27, 36, 46, 51, 62, 73, 85, 86,
+                          107, 109, 110, 121, 124, 132, 143, 151, 160, 168,
+                          178, 179, 214, 215, 216, 217, 259, 312, 315, 316,
+                          319, 328, 329, 344, 355, 367, 369, 377, 380, 382,
+                          397, 411, 437, 438, 440, 441, 448, 453, 454, 484,
+                          486, 490, 498, 502, 505],
+          "0021500582" : [13, 29, 31, 33, 67, 106, 109, 118, 141, 153, 154,
+                          312, 321, 326, 329, 346, 347, 380, 386, 409, 417,
+                          434, 446, 452, 457, 481, 503, 525, 535,
+                          541, 543, 549, 577]
+          }
 
+
+
+"""
 mandefs = {"0021500149": [33, 90, 97, 137, 157, 188, 200, 205, 206,
                           215, 269, 279, 294, 328, 342, 382, 396, 434,
                           475, 477, 500, 540, 550, 555],
@@ -37,30 +71,9 @@ mandefs = {"0021500149": [33, 90, 97, 137, 157, 188, 200, 205, 206,
            "0021500582": [106, 118, 141, 153, 312, 452, 457, 503,
                           525, 541, 543, 577]
            }
-
-"""
-length = 0
-for key in zonedefs.keys():
-    length += len(zonedefs[key] + mandefs[key])
-
-print "LENGTH " + str(length)
 """
 
-"""
-print str("*" * 30) + " ZONE DEFENSE " + str("*" * 30)
-gid = "0021500197"
-with open(SPORTVU_PATH + gid + '.json') as sportvu:
-    data = json.load(sportvu)
-    eid = 383
-    # try:
-    action = convert_moment_to_action(data, eid, check_frames=False)
-    action.label = -1
-    action.save()
-    run(eid=eid, gid=gid, act=action)
-    except Exception:
-        print "gid: " + str(gid) + " | eid: " + str(eid)
-"""
-
+passed_zone, passed_man, failed_zone, failed_man = 0, 0, 0, 0
 
 print str("*" * 30) + " ZONE DEFENSE " + str("*" * 30)
 for gid in sorted(zonedefs.keys()):
@@ -72,9 +85,14 @@ for gid in sorted(zonedefs.keys()):
                                               check_frames=True, label=-1)
             action.save()
             run(eid=eid, gid=gid, act=action)
-        except Exception:
-            print "gid: " + str(gid) + " | eid: " + str(eid)
+            passed_zone += 1
+        except Exception as e:
+            print str(e) + " gid: " + str(gid) + " | eid: " + str(eid)
+            failed_zone += 1
 
+print ""
+print "passed: " + str(passed_zone) + "/" + str(passed_zone + failed_zone)
+print "failed: " + str(failed_zone) + "/" + str(passed_zone + failed_zone)
 
 print str("*" * 30) + " MAN TO MAN " + str("*" * 30)
 for gid in sorted(mandefs.keys()):
@@ -86,32 +104,15 @@ for gid in sorted(mandefs.keys()):
                                               check_frames=True, label=1)
             action.save()
             run(eid=eid, gid=gid, act=action)
-        except Exception:
-            print "gid: " + str(gid) + " | eid: " + str(eid)
+            passed_man += 1
+        except Exception as e:
+            print str(e) + " gid: " + str(gid) + " | eid: " + str(eid)
+            failed_man += 1
 
-"""
-for gid in sorted(mandefs.keys()):
-    with open(SPORTVU_PATH + str(gid) + '.json') as sportvu:
-        data = json.load(sportvu)
-    for eid in (mandefs[gid] + zonedefs[gid]):
-        try:
-            visualize(gid, eid, -1 if eid in zonedefs[gid] else 1)
-            print "DONE: " + str(gid) + " " + str(eid)
-        except Exception:
-            print " gid: " + str(gid) + " | eid: " + str(eid)
-"""
+print ""
+print "passed: " + str(passed_man) + "/" + str(passed_man + failed_man)
+print "failed: " + str(failed_man) + "/" + str(passed_man + failed_man)
 
-
-"""
-actions = []
-for g in games:
-    data = json.load(open("data/actions/" + g + ".json"))
-    zoneactions = [key for key in data.keys() if data[key]["label"] == -1]
-    print g + " " + str(len(zoneactions))
-    actions += zoneactions
-    # for key in data.keys():
-    #    if data[key]["label"] == 0:
-    #        data.pop(key, None)
-
-print "zone defenses: " + str(len(actions))
-"""
+print ""
+print " TOTAL: "
+print str(passed_man + passed_zone) + "/" + str(failed_man + failed_zone)
