@@ -6,7 +6,7 @@ def determine_matchup_over_time(action):
     matchup = []
     length = len(action.coords)
     for i in range(length):
-        matchup.append(determine_matchup(action, i, "cannonical"))
+        matchup.append(determine_matchup(action, i, "canonical"))
     return matchup
 
 
@@ -65,7 +65,7 @@ def get_coords(coords, players):
     return ctk
 
 
-def get_cannonical_position(action, time):
+def get_canonical_position(action, time):
     arrange_by_position(action)
     ball = (action.coords[time][0][2], action.coords[time][0][3])
     otk = get_coords(action.coords[time], action.offense)
@@ -85,7 +85,7 @@ def determine_matchup(action, time, by):
     if by == "distance":
         offender_loc = get_coords(action.coords[time], action.offense)
     else:
-        offender_loc = get_cannonical_position(action, time)
+        offender_loc = get_canonical_position(action, time)
 
     # defender rows
     # offender cols

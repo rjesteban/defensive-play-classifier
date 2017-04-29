@@ -26,8 +26,9 @@ def evaluate_using_bootstrap(classifier, X, y, k=10):
         sensitivity_train = TP_train / P_train
         specificity_train = TN_train / N_train
 
-        accuracy_train = ((sensitivity_train * (P_train / (P_train + N_train)))
-                          + (specificity_train *
+        accuracy_train = ((sensitivity_train *
+                          (P_train / (P_train + N_train))) +
+                          (specificity_train *
                           (N_train / (P_train + N_train))))
 
         cf_test = confusion_matrix(y_test, y_pred, labels=[-1, 1])

@@ -138,7 +138,7 @@ def visualize(data, eventid, label):
     ball_circ = plt.Circle((0, 0), 1.1, color=[1, 0.4, 0])
     for i in range(10):  # create circle object and text object for each player
         # color scheme   home if i < 5 else away
-        col = ['w', 'b'] if i < 5 else ['b', 'w']
+        col = ['w', 'k'] if i < 5 else ['k', 'w']
         player_circ[i] = plt.Circle(
             (0, 0), 2.2, facecolor=col[0], edgecolor='k')  # player circle
         # player jersey  #  (text)

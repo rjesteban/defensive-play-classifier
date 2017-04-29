@@ -40,27 +40,27 @@ def get_playersoncourt(data, eid, side='home'):
 
 
 def contains(event, num, word):
-    return event[num] is not None and word in str(event[num])
+    return event[num] is not None and word.lower() in str(event[num]).lower()
 
 
 def determine_offs_defs(data, gameid, eid):
     pbp = pbputil.get_pbp(str(gameid))
     pbpindex = pbputil.find_index(pbp, eid)
     event = pbp['resultSets'][0]['rowSet'][pbpindex]
-    if (event[2] in [1, 2] and event[7] is not None and
-       ('Shot' or 'MISS' in str(event[7])) or
-       event[2] == 5 and contains(event, 7, 'Turnover') or
-       event[2] == 6 and contains(event, 9, 'S.FOUL')):
-        # away ang defense
+    # event[7] is HOMEDESCRIPTION
+    # event[9] is VISITORDESCRIPTION
+    if ((event[2] in [1, 2] or
+        contains(event, 7, 'Turnover')) or
+       contains(event, 9, 'S.FOUL') or contains(event, 9, 'P.FOUL')):
+        # visitor defends
         offense = get_playersoncourt(data, eid)
         defense = get_playersoncourt(data, eid, side='visitor')
         return {'offense': offense, 'defense': defense}
-    elif (event[2] in [1, 2] and event[9] is not None and
-          'Shot' or 'MISS' in str(event[9]) or
-          event[2] == 5 and contains(event, 9, 'Turnover') or
-          event[2] == 6 and contains(event, 7, 'S.FOUL')):
-        # home ang defense
+    elif ((event[2] in [1, 2] or
+          contains(event, 9, 'Turnover')) or
+          contains(event, 7, 'S.FOUL') or contains(event, 7, 'P.FOUL')):
+        # home defends
         offense = get_playersoncourt(data, eid, side='visitor')
         defense = get_playersoncourt(data, eid)
         return {'offense': offense, 'defense': defense}
-    raise Exception("Not an event")
+    raise Exception("Not an event/Cant determine off def")

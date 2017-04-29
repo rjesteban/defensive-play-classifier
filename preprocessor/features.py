@@ -1,6 +1,6 @@
 from fastdtw import fastdtw
 from preprocessor.utils import (determine_matchup_over_time, get_distance,
-                                get_coords, get_cannonical_position,
+                                get_coords, get_canonical_position,
                                 determine_matchup, arrange_by_position)
 from scipy.spatial.distance import euclidean
 import math
@@ -12,32 +12,14 @@ distance = np.zeros((5, 5), dtype=np.int)
 
 # entropy for each defender
 def get_entropy(action):
-    entropy = sum(determine_matchup_over_time(action)[25:-25])
-    length = len(action.coords[25:-25])
+    entropy = sum(determine_matchup_over_time(action))  # [25:-25])
+    length = len(action.coords)  # [25:-25])
     for r in range(len(entropy)):  # defenders
         for c in range(len(entropy[0])):  # offenders
             if entropy[r][c] > 0:
                 p = entropy[r][c] / float(length)
                 entropy[r][c] = -(p * math.log(p, 2))
     return [sum(row) for row in entropy]
-
-
-"""
-# entropy for each defender
-def get_entropy(action):
-    entropy = []
-    length = len(action.coords)
-    for i in range(length):
-        entropy.append(determine_matchup(action, i, "canonical"))
-
-    entropy = sum(entropy)
-    for r in range(len(entropy)):  # defenders
-        for c in range(len(entropy[0])):  # offenders
-            if entropy[r][c] > 0:
-                p = entropy[r][c] / float(length)
-                entropy[r][c] = -(p * math.log(p, 2))
-    return [sum(row) for row in entropy]
-"""
 
 
 def get_DTW(action):
@@ -69,24 +51,23 @@ def get_mean_distance(action):
     return [float(p) / length for p in dist]
 
 
-def get_mean_distance_from_cannonical_position(action):
+def get_mean_distance_from_canonical_position(action):
     matchup = determine_matchup_over_time(action)
     length = len(matchup)
     match = [p.argmax() for p in matchup[25]]  # sum(matchup)
     dist = [0 for r in range(5)]
     for time in range(len(matchup)):
         defenders = get_coords(action.coords[time], action.defense)
-        # offenders = get_coords(action.coords[time], action.offense)
-        offenders = get_cannonical_position(action, time)
+        offenders = get_canonical_position(action, time)
         for d in range(5):  # defenders
             dist[d] += get_distance(defenders[d], offenders[match[d]])
     return [float(p) / length for p in dist]
 
 
 def get_time_defending(action):
-    matchup = determine_matchup_over_time(action)[25:-25]
-    match = [p.argmax() for p in matchup[25]]
-    defending = get_mean_distance_from_cannonical_position(action)
+    matchup = determine_matchup_over_time(action)
+    match = [p.argmax() for p in matchup[25]]  # sum(matchup)
+    defending = get_mean_distance_from_canonical_position(action)
     # return [float(defending[d] / sum(matchup[25:-25])[index][d])
     #         for index, d in enumerate(match)]
     return [float(defending[d] *
@@ -102,7 +83,7 @@ def get_distance_from_post(action):
     length = len(action.coords)
     arrange_by_position(action)
     defenders = [get_coords(action.coords[time], action.defense)
-                 for time in range(length)][25:-25]
+                 for time in range(length)][0:-25]
     post = defenders[0]
     dist_from_post = [0 for r in range(5)]
     for coords in defenders:
@@ -111,12 +92,27 @@ def get_distance_from_post(action):
     return [float(p) / len(defenders) for p in dist_from_post]
 
 
+def get_diff_canon_vs_matchup(action):
+    matchup = determine_matchup_over_time(action)
+    length = len(matchup)
+    match = [p.argmax() for p in matchup[25]]  # sum(matchup)
+    dist = [0 for r in range(5)]
+    for time in range(len(matchup)):
+        defenders = get_coords(action.coords[time], action.defense)
+        canon = get_canonical_position(action, time)
+        offenders = get_coords(action.coords[time], action.offense)
+        for d in range(5):  # defenders
+            dist[d] += (get_distance(defenders[d], offenders[match[d]]) -
+                        get_distance(canon[match[d]], offenders[match[d]]))
+    return [float(p) / length for p in dist]
+
+
 # average speed = distance moved / time taken
-def get_average_speed(action):
+def get_average_speed_defense(action):
     length = len(action.coords)
     arrange_by_position(action)
     defenders = [get_coords(action.coords[time], action.defense)
-                 for time in range(length)][25:-25]
+                 for time in range(length)][0:-25]
     dist = [0 for r in range(5)]
     for index, coords in enumerate(defenders):
         for d in range(5):
@@ -124,14 +120,14 @@ def get_average_speed(action):
     return [float(p) / len(defenders) for p in dist]
 
 
-"""
-import numpy as np
-from scipy.spatial.distance import euclidean
-
-from fastdtw import fastdtw
-
-x = np.array([[1,1], [2,2], [3,3], [4,4], [5,5]])
-y = np.array([[2,2], [3,3], [4,4]])
-distance, path = fastdtw(x, y, dist=euclidean)
-print(distance)
-"""
+# average speed = distance moved / time taken
+def get_average_speed_offense(action):
+    length = len(action.coords)
+    arrange_by_position(action)
+    offenders = [get_coords(action.coords[time], action.offense)
+                 for time in range(length)][0:-25]
+    dist = [0 for r in range(5)]
+    for index, coords in enumerate(offenders):
+        for d in range(5):
+            dist[d] += get_distance(coords[d], offenders[index - 1][d])
+    return [float(p) / len(offenders) for p in dist]

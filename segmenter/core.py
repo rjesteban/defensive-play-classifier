@@ -69,22 +69,31 @@ def convert_moment_to_action(data, eid, check_frames=True, label=0):
         ball = moment[fr][5][0]
         mins = int(moment[fr][2] / 60)
         secs = int(((moment[fr][2] / 60.0) - mins) * 60)
-        # print "Time remaining: " + str(mins) + ":" + str(secs)
         if less_than(mins, secs, end_min, end_sec):
             break
         if all_on_one_side(moment, eid, fr):
+            frames.append(frame)
             if within_the_paint(ball, eid):
                 inside_count += 1
-            frames.append(frame)
+            else:
+                inside_count = 0
+            # height of ball: ball[4]
+            # if inside_count > 50 or ball[4] > 12 and len(frames) >= 120:
+            if ball[4] > 13 and len(frames) >= 130:
+                prev_frames = frames
+                frames = []
+                inside_count = 0
         else:
-            if len(frames) != 0:
+            if len(frames) >= 130:
                 prev_frames = frames
             inside_count = 0
             frames = []
-    if check_frames and ((len(frames) or prev_frames) < 130):
-        raise Exception("Insufficient number of frames: " + str(len(frames)))
-    if len(frames) == 0:
-        frames = prev_frames
+    if check_frames and (len(frames) < 130):
+        if len(prev_frames) >= 130:
+            frames = prev_frames
+        else:
+            raise Exception("Insufficient number of frames: " +
+                            str(len(frames)) + " | " + str(len(prev_frames)))
     players = determine_offs_defs(data, gameid, eid)
     offense = players['offense']
     defense = players['defense']
@@ -95,5 +104,4 @@ def convert_moment_to_action(data, eid, check_frames=True, label=0):
                     time=the_time, quarter=quarter,
                     offense=offense, defense=defense, label=label)
     transform_wlog(action)
-    action.save()
     return action

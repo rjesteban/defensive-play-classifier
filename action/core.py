@@ -8,9 +8,9 @@ def load_action(gameid, eid):
         data = json.load(f)
     ctx = data[str(eid)]
     action = Action(gameid=str(ctx['gameid']), eid=ctx['eventid'],
-               coords=ctx['coords'], time=ctx['time'], quarter=ctx['quarter'],
-               offense=ctx['offense'], defense=ctx['defense'],
-               label=ctx['label'])
+                    coords=ctx['coords'], time=ctx['time'],
+                    quarter=ctx['quarter'], offense=ctx['offense'],
+                    defense=ctx['defense'], label=ctx['label'])
     return action
 
 
