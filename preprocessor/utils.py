@@ -56,6 +56,9 @@ def arrange_by_position(action):
 
 
 def get_coords(coords, players):
+    """
+    returns : array of [x, y] coordinates according to order of players.
+    """
     ctk = []
     for p in players:
         for coord in coords:

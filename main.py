@@ -51,7 +51,7 @@ if __name__ == '__main__':
             moments[gid] = [evts[randint(0, len(evts) - 1)]
                             for index in range(25)]
         print '    "' + gid + '": ' + str(sorted([evt for evt in moments[gid]
-                                if evt not in games[gid]])) + ", "
+                                          if evt not in games[gid]])) + ", "
     print "}"
 
     """
