@@ -1,16 +1,20 @@
+from operator import itemgetter
 from sampling.bootstrap import bootstrap632
+from sklearn.cross_validation import train_test_split
+from sklearn.cross_validation import StratifiedKFold
 from sklearn.metrics import confusion_matrix
 import numpy as np
 
 
-def evaluate_using_bootstrap(classifier, X, y, k=10):
-    k = 10
+def evaluate_using_bootstrap(classifier, X, y, n_folds=10):
     acc_train = []
     acc_test = []
-    for i in range(k):
+    clf_list = []
+    for i in range(n_folds):
         X_train, X_test, y_train, y_test = bootstrap632(X, y)
         clf = classifier()
         clf.fit(X_train, y_train)
+        clf_list.append(clf)
 
         y_pred = [clf.predict(x)[0] for x in X_test]
         y_train_pred = [clf.predict(x) for x in X_train]
@@ -55,4 +59,63 @@ def evaluate_using_bootstrap(classifier, X, y, k=10):
 
     acc_m = (0.632 * np.mean(acc_test)) + (0.368 * np.mean(acc_train))
     print "Accuracy of the model: " + str(acc_m)
-    return acc_m
+    return acc_m, clf_list
+
+
+def cross_validate_stratify(clf, X, y, fold=10):
+    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.4,
+                                                        stratify=y)
+
+    cv = []
+    for i in range(fold):
+        cv.append(train_test_split(X_train, y_train,
+                  test_size=0.3, stratify=y_train))
+
+    classifiers = []
+    for (train_X, test_X, train_y, test_y) in cv:
+        classifier = clf.fit(train_X, train_y)
+        classifiers.append(classifier)
+
+    metrics = ([get_metrics(svm, xtst, ytst)
+               for svm, (xtr, xtst, ytr, ytst) in zip(classifiers, cv)])
+
+    sensitivity_list = [sens for (sens, spec, acc, matrix) in metrics]
+    specificity_list = [spec for (sens, spec, acc, matrix) in metrics]
+    accuracy_list = [acc for (sens, spec, acc, matrix) in metrics]
+
+    sensitivity_index = sensitivity_list.index(max(sensitivity_list))
+    specificity_index = specificity_list.index(max(specificity_list))
+    accuracy_index = accuracy_list.index(max(accuracy_list))
+
+    best_acc = classifiers[accuracy_index]
+    best_sens = classifiers[sensitivity_index]
+    best_spec = classifiers[specificity_index]
+
+    acc_metrics_train = metrics[accuracy_index]
+    sens_metrics_train = metrics[sensitivity_index]
+    spec_metrics_train = metrics[specificity_index]
+
+    acc_metrics_test = get_metrics(best_acc, X_test, y_test)
+    sens_metrics_test = get_metrics(best_sens, X_test, y_test)
+    spec_metrics_test = get_metrics(best_spec, X_test, y_test)
+
+    return {"acc_model": [best_acc, acc_metrics_train, acc_metrics_test],
+            "sens_model": [best_sens, sens_metrics_train, sens_metrics_test],
+            "spec_model": [best_spec, spec_metrics_train, spec_metrics_test]}
+
+
+def get_metrics(clf, X, y):
+    y_pred = [clf.predict(x) for x in X]
+    matrix = confusion_matrix(y, y_pred, labels=[-1, 1])
+    TN = matrix[0][0] * 1.0
+    FN = matrix[1][0] * 1.0
+    TP = matrix[1][1] * 1.0
+    FP = matrix[0][1] * 1.0
+    P = (TP + FN) * 1.0
+    N = (TN + FP) * 1.0
+
+    sensitivity = TP / P
+    specificity = TN / N
+
+    accuracy = (sensitivity * (P / (P + N))) + (specificity * (N / (P + N)))
+    return sensitivity, specificity, accuracy, matrix
