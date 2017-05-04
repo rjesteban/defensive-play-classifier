@@ -62,10 +62,7 @@ def evaluate_using_bootstrap(classifier, X, y, n_folds=10):
     return acc_m, clf_list
 
 
-def cross_validate_stratify(clf, X, y, fold=10):
-    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.4,
-                                                        stratify=y)
-
+def cross_validate_stratify(clf, X_train, X_test, y_train, y_test, fold=10):
     cv = []
     for i in range(fold):
         cv.append(train_test_split(X_train, y_train,
@@ -119,3 +116,43 @@ def get_metrics(clf, X, y):
 
     accuracy = (sensitivity * (P / (P + N))) + (specificity * (N / (P + N)))
     return sensitivity, specificity, accuracy, matrix
+
+
+def present_metrics(acc, sens, spec):
+    print "####### TRAIN ACC #######"
+    print "ACCURACY: " + str(acc[1][2])
+    print "SENSITIVITY: " + str(acc[1][0])
+    print "SPECIFICITY: " + str(acc[1][1])
+    print acc[1][3]
+
+    print "####### TRAIN SENS #######"
+    print "ACCURACY: " + str(sens[1][2])
+    print "SENSITIVITY: " + str(sens[1][0])
+    print "SPECIFICITY: " + str(sens[1][1])
+    print sens[1][3]
+
+    print "####### TRAIN SPEC #######"
+    print "ACCURACY: " + str(spec[1][2])
+    print "SENSITIVITY: " + str(spec[1][0])
+    print "SPECIFICITY: " + str(spec[1][1])
+    print spec[1][3]
+
+    print ""
+
+    print "####### TEST ACC #######"
+    print "ACCURACY: " + str(acc[2][2])
+    print "SENSITIVITY: " + str(acc[2][0])
+    print "SPECIFICITY: " + str(acc[2][1])
+    print acc[2][3]
+
+    print "####### TEST SENS #######"
+    print "ACCURACY: " + str(sens[2][2])
+    print "SENSITIVITY: " + str(sens[2][0])
+    print "SPECIFICITY: " + str(sens[2][1])
+    print sens[2][3]
+
+    print "####### TEST SPEC #######"
+    print "ACCURACY: " + str(spec[2][2])
+    print "SENSITIVITY: " + str(spec[2][0])
+    print "SPECIFICITY: " + str(spec[2][1])
+    print spec[2][3]
