@@ -1,5 +1,6 @@
 from sampling.bootstrap import bootstrap632
-from sklearn.metrics import confusion_matrix, roc_auc_score, roc_curve
+from sklearn.metrics import (confusion_matrix, roc_auc_score,
+                             roc_curve, f1_score)
 import numpy as np
 
 
@@ -71,33 +72,40 @@ def cross_validate_stratify(clf, X_train, X_test, y_train, y_test, skf):
     metrics = ([get_metrics(svm, xtst, ytst)
                for svm, (xtr, xtst, ytr, ytst) in zip(classifiers, cv)])
 
-    sensitivity_list = ([sens for (sens, spec, acc, auroc, matrix,
+    # ([sensitivity, specificity, fscore, accuracy, auroc_score, matrix,
+    #        [fpr, tpr, thresholds]])
+    sensitivity_list = ([sens for (sens, spec, fscore, acc, auroc, matrix,
                         [fp, tp, th]) in metrics])
-    specificity_list = ([spec for (sens, spec, acc, auroc, matrix,
+    specificity_list = ([spec for (sens, spec, fscore, acc, auroc, matrix,
                         [fp, tp, th]) in metrics])
-    accuracy_list = ([acc for (sens, spec, acc, auroc, matrix,
+    fscore_list = ([fscore for (sens, spec, fscore, acc, auroc, matrix,
+                   [fp, tp, th]) in metrics])
+    accuracy_list = ([acc for (sens, spec, fscore, acc, auroc, matrix,
                      [fp, tp, th]) in metrics])
-
-    roc_auc_list = ([auroc for (sens, spec, acc, auroc, matrix,
+    roc_auc_list = ([auroc for (sens, spec, fscore, acc, auroc, matrix,
                     [fp, tp, th]) in metrics])
 
     sensitivity_index = sensitivity_list.index(max(sensitivity_list))
     specificity_index = specificity_list.index(max(specificity_list))
+    fscore_index = fscore_list.index(max(fscore_list))
     accuracy_index = accuracy_list.index(max(accuracy_list))
     roc_auc_index = roc_auc_list.index(max(roc_auc_list))
 
     best_acc = classifiers[accuracy_index]
     best_sens = classifiers[sensitivity_index]
+    best_fscore = classifiers[fscore_index]
     best_spec = classifiers[specificity_index]
     best_auroc = classifiers[roc_auc_index]
 
     acc_metrics_train = metrics[accuracy_index]
     sens_metrics_train = metrics[sensitivity_index]
+    fscore_metrics_train = metrics[fscore_index]
     spec_metrics_train = metrics[specificity_index]
     auroc_metrics_train = metrics[roc_auc_index]
 
     acc_metrics_test = get_metrics(best_acc, X_test, y_test)
     sens_metrics_test = get_metrics(best_sens, X_test, y_test)
+    fscore_metrics_test = get_metrics(best_fscore, X_test, y_test)
     spec_metrics_test = get_metrics(best_spec, X_test, y_test)
     auroc_metrics_test = get_metrics(best_auroc, X_test, y_test)
 
@@ -105,7 +113,9 @@ def cross_validate_stratify(clf, X_train, X_test, y_train, y_test, skf):
             "sens_model": [best_sens, sens_metrics_train, sens_metrics_test],
             "spec_model": [best_spec, spec_metrics_train, spec_metrics_test],
             "auroc_model": ([best_auroc, auroc_metrics_train,
-                            auroc_metrics_test])
+                            auroc_metrics_test]),
+            "fscore_model": ([best_fscore, fscore_metrics_train,
+                             fscore_metrics_test])
             }
 
 
@@ -128,52 +138,24 @@ def get_metrics(clf, X, y):
     scores = clf.predict_proba(X)[:, 1]
     auroc_score = roc_auc_score(yreshape, scores, average='weighted')
     fpr, tpr, thresholds = roc_curve(y, scores, pos_label=1)
-
-    return ([sensitivity, specificity, accuracy, auroc_score, matrix,
+    fscore = f1_score(y, y_pred)
+    return ([sensitivity, specificity, fscore, accuracy, auroc_score, matrix,
             [fpr, tpr, thresholds]])
 
 
-def present_metrics(acc, sens, spec):
-    print "####### TRAIN ACC #######"
-    print "ACCURACY: " + str(acc[1][2])
-    print "SENSITIVITY: " + str(acc[1][0])
-    print "SPECIFICITY: " + str(acc[1][1])
-    print "AUROC: " + str(acc[1][3])
-    print acc[1][4]
+def present_metrics(result, label):
+    print "####### TRAIN " + label + " #######"
+    print "SENSITIVITY: " + str(result[1][0])
+    print "SPECIFICITY: " + str(result[1][1])
+    print "FSCORE: " + str(result[1][2])
+    print "ACCURACY: " + str(result[1][3])
+    print "AUROC: " + str(result[1][4])
+    print result[1][5]
 
-    print "####### TRAIN SENS #######"
-    print "ACCURACY: " + str(sens[1][2])
-    print "SENSITIVITY: " + str(sens[1][0])
-    print "SPECIFICITY: " + str(sens[1][1])
-    print "AUROC: " + str(sens[1][3])
-    print sens[1][4]
-
-    print "####### TRAIN SPEC #######"
-    print "ACCURACY: " + str(spec[1][2])
-    print "SENSITIVITY: " + str(spec[1][0])
-    print "SPECIFICITY: " + str(spec[1][1])
-    print "AUROC: " + str(spec[1][3])
-    print spec[1][4]
-
-    print ""
-
-    print "####### TEST ACC #######"
-    print "ACCURACY: " + str(acc[2][2])
-    print "SENSITIVITY: " + str(acc[2][0])
-    print "SPECIFICITY: " + str(acc[2][1])
-    print "AUROC: " + str(acc[2][3])
-    print acc[2][4]
-
-    print "####### TEST SENS #######"
-    print "ACCURACY: " + str(sens[2][2])
-    print "SENSITIVITY: " + str(sens[2][0])
-    print "SPECIFICITY: " + str(sens[2][1])
-    print "AUROC: " + str(sens[2][3])
-    print sens[2][4]
-
-    print "####### TEST SPEC #######"
-    print "ACCURACY: " + str(spec[2][2])
-    print "SENSITIVITY: " + str(spec[2][0])
-    print "SPECIFICITY: " + str(spec[2][1])
-    print "AUROC: " + str(spec[2][3])
-    print spec[2][4]
+    print "####### TEST " + label + " #######"
+    print "SENSITIVITY: " + str(result[2][0])
+    print "SPECIFICITY: " + str(result[2][1])
+    print "FSCORE: " + str(result[2][2])
+    print "ACCURACY: " + str(result[2][3])
+    print "AUROC: " + str(result[2][4])
+    print result[2][5]
