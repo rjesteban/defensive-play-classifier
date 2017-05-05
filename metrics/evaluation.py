@@ -1,5 +1,5 @@
 from sampling.bootstrap import bootstrap632
-from sklearn.metrics import confusion_matrix
+from sklearn.metrics import confusion_matrix, roc_auc_score, roc_curve
 import numpy as np
 
 
@@ -71,36 +71,42 @@ def cross_validate_stratify(clf, X_train, X_test, y_train, y_test, skf):
     metrics = ([get_metrics(svm, xtst, ytst)
                for svm, (xtr, xtst, ytr, ytst) in zip(classifiers, cv)])
 
-    metrics = ([svm.decision_function(xtst)
-               for svm, (xtr, xtst, ytr, ytst) in zip(classifiers, cv)])
+    sensitivity_list = ([sens for (sens, spec, acc, auroc, matrix,
+                        [fp, tp, th]) in metrics])
+    specificity_list = ([spec for (sens, spec, acc, auroc, matrix,
+                        [fp, tp, th]) in metrics])
+    accuracy_list = ([acc for (sens, spec, acc, auroc, matrix,
+                     [fp, tp, th]) in metrics])
 
-    sensitivity_list = [sens for (sens, spec, acc, matrix) in metrics]
-    specificity_list = [spec for (sens, spec, acc, matrix) in metrics]
-    accuracy_list = [acc for (sens, spec, acc, matrix) in metrics]
-
-    print sensitivity_list
-    print specificity_list
-    print accuracy_list
+    roc_auc_list = ([auroc for (sens, spec, acc, auroc, matrix,
+                    [fp, tp, th]) in metrics])
 
     sensitivity_index = sensitivity_list.index(max(sensitivity_list))
     specificity_index = specificity_list.index(max(specificity_list))
     accuracy_index = accuracy_list.index(max(accuracy_list))
+    roc_auc_index = roc_auc_list.index(max(roc_auc_list))
 
     best_acc = classifiers[accuracy_index]
     best_sens = classifiers[sensitivity_index]
     best_spec = classifiers[specificity_index]
+    best_auroc = classifiers[roc_auc_index]
 
     acc_metrics_train = metrics[accuracy_index]
     sens_metrics_train = metrics[sensitivity_index]
     spec_metrics_train = metrics[specificity_index]
+    auroc_metrics_train = metrics[roc_auc_index]
 
     acc_metrics_test = get_metrics(best_acc, X_test, y_test)
     sens_metrics_test = get_metrics(best_sens, X_test, y_test)
     spec_metrics_test = get_metrics(best_spec, X_test, y_test)
+    auroc_metrics_test = get_metrics(best_auroc, X_test, y_test)
 
     return {"acc_model": [best_acc, acc_metrics_train, acc_metrics_test],
             "sens_model": [best_sens, sens_metrics_train, sens_metrics_test],
-            "spec_model": [best_spec, spec_metrics_train, spec_metrics_test]}
+            "spec_model": [best_spec, spec_metrics_train, spec_metrics_test],
+            "auroc_model": ([best_auroc, auroc_metrics_train,
+                            auroc_metrics_test])
+            }
 
 
 def get_metrics(clf, X, y):
@@ -117,7 +123,14 @@ def get_metrics(clf, X, y):
     specificity = TN / N
 
     accuracy = (sensitivity * (P / (P + N))) + (specificity * (N / (P + N)))
-    return sensitivity, specificity, accuracy, matrix
+
+    yreshape = np.reshape(y, (len(y), 1))
+    scores = clf.predict_proba(X)[:, 1]
+    auroc_score = roc_auc_score(yreshape, scores, average='weighted')
+    fpr, tpr, thresholds = roc_curve(y, scores, pos_label=1)
+
+    return ([sensitivity, specificity, accuracy, auroc_score, matrix,
+            [fpr, tpr, thresholds]])
 
 
 def present_metrics(acc, sens, spec):
@@ -125,19 +138,22 @@ def present_metrics(acc, sens, spec):
     print "ACCURACY: " + str(acc[1][2])
     print "SENSITIVITY: " + str(acc[1][0])
     print "SPECIFICITY: " + str(acc[1][1])
-    print acc[1][3]
+    print "AUROC: " + str(acc[1][3])
+    print acc[1][4]
 
     print "####### TRAIN SENS #######"
     print "ACCURACY: " + str(sens[1][2])
     print "SENSITIVITY: " + str(sens[1][0])
     print "SPECIFICITY: " + str(sens[1][1])
-    print sens[1][3]
+    print "AUROC: " + str(sens[1][3])
+    print sens[1][4]
 
     print "####### TRAIN SPEC #######"
     print "ACCURACY: " + str(spec[1][2])
     print "SENSITIVITY: " + str(spec[1][0])
     print "SPECIFICITY: " + str(spec[1][1])
-    print spec[1][3]
+    print "AUROC: " + str(spec[1][3])
+    print spec[1][4]
 
     print ""
 
@@ -145,16 +161,19 @@ def present_metrics(acc, sens, spec):
     print "ACCURACY: " + str(acc[2][2])
     print "SENSITIVITY: " + str(acc[2][0])
     print "SPECIFICITY: " + str(acc[2][1])
-    print acc[2][3]
+    print "AUROC: " + str(acc[2][3])
+    print acc[2][4]
 
     print "####### TEST SENS #######"
     print "ACCURACY: " + str(sens[2][2])
     print "SENSITIVITY: " + str(sens[2][0])
     print "SPECIFICITY: " + str(sens[2][1])
-    print sens[2][3]
+    print "AUROC: " + str(sens[2][3])
+    print sens[2][4]
 
     print "####### TEST SPEC #######"
     print "ACCURACY: " + str(spec[2][2])
     print "SENSITIVITY: " + str(spec[2][0])
     print "SPECIFICITY: " + str(spec[2][1])
-    print spec[2][3]
+    print "AUROC: " + str(spec[2][3])
+    print spec[2][4]
