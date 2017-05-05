@@ -153,7 +153,7 @@ def visualize(data, eventid, label):
                                   init_func=init, blit=False,
                                   interval=5, repeat=False, save_count=0)
 
-    folder = "zone" if label == -1 else "man"
+    folder = "zone" if label == 1 else "man"
     # instead of gameid, get data['gameid']
     ani.save('data/videos/events/%s/%s_%d.mp4' % (folder, data['gameid'],
              search_id), dpi=100, fps=25)

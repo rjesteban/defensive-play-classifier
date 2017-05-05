@@ -1,7 +1,4 @@
-from operator import itemgetter
 from sampling.bootstrap import bootstrap632
-from sklearn.cross_validation import train_test_split
-from sklearn.cross_validation import StratifiedKFold
 from sklearn.metrics import confusion_matrix
 import numpy as np
 
@@ -62,23 +59,28 @@ def evaluate_using_bootstrap(classifier, X, y, n_folds=10):
     return acc_m, clf_list
 
 
-def cross_validate_stratify(clf, X_train, X_test, y_train, y_test, fold=10):
+def cross_validate_stratify(clf, X_train, X_test, y_train, y_test, skf):
     cv = []
-    for i in range(fold):
-        cv.append(train_test_split(X_train, y_train,
-                  test_size=0.3, stratify=y_train))
-
     classifiers = []
-    for (train_X, test_X, train_y, test_y) in cv:
-        classifier = clf.fit(train_X, train_y)
-        classifiers.append(classifier)
+    for train_index, test_index in skf:
+        train_X, test_X = X_train[train_index], X_train[test_index]
+        train_y, test_y = y_train[train_index], y_train[test_index]
+        classifiers.append(clf.fit(train_X, train_y))
+        cv.append([train_X, test_X, train_y, test_y])
 
     metrics = ([get_metrics(svm, xtst, ytst)
+               for svm, (xtr, xtst, ytr, ytst) in zip(classifiers, cv)])
+
+    metrics = ([svm.decision_function(xtst)
                for svm, (xtr, xtst, ytr, ytst) in zip(classifiers, cv)])
 
     sensitivity_list = [sens for (sens, spec, acc, matrix) in metrics]
     specificity_list = [spec for (sens, spec, acc, matrix) in metrics]
     accuracy_list = [acc for (sens, spec, acc, matrix) in metrics]
+
+    print sensitivity_list
+    print specificity_list
+    print accuracy_list
 
     sensitivity_index = sensitivity_list.index(max(sensitivity_list))
     specificity_index = specificity_list.index(max(specificity_list))

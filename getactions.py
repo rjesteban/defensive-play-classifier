@@ -81,7 +81,7 @@ for gid in sorted(zonedefs.keys()):
     for eid in zonedefs[gid]:
         try:
             action = convert_moment_to_action(data, eid,
-                                              check_frames=True, label=-1)
+                                              check_frames=True, label=1)
             action.save()
             # run(eid=eid, gid=gid, act=action)
             passed_zone += 1
@@ -100,7 +100,7 @@ for gid in sorted(mandefs.keys()):
     for eid in mandefs[gid]:
         try:
             action = convert_moment_to_action(data, eid,
-                                              check_frames=True, label=1)
+                                              check_frames=True, label=-1)
             action.save()
             # run(eid=eid, gid=gid, act=action)
             passed_man += 1

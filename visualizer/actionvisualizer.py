@@ -117,7 +117,7 @@ def run(eid, gid, act=None):
                                   interval=5, repeat=False, save_count=0)
 
     if action.label == -1:
-        ani.save(PATH + 'Zone/Action_%s_%d.mp4' % (gid, eid), dpi=100, fps=25)
-    else:
         ani.save(PATH + 'Man/Action_%s_%d.mp4' % (gid, eid), dpi=100, fps=25)
+    else:
+        ani.save(PATH + 'Zone/Action_%s_%d.mp4' % (gid, eid), dpi=100, fps=25)
     plt.close('all')
