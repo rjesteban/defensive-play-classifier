@@ -1,12 +1,12 @@
 from sampling.bootstrap import bootstrap632
-from sklearn.metrics import (confusion_matrix, roc_auc_score,
-                             roc_curve, f1_score)
+from sklearn.metrics import (confusion_matrix, matthews_corrcoef)
+import math
 import numpy as np
 
 
 def evaluate_using_bootstrap(classifier, X, y, n_folds=10):
-    acc_train = []
-    acc_test = []
+    gmean_train = []
+    gmean_test = []
     clf_list = []
     for i in range(n_folds):
         X_train, X_test, y_train, y_test = bootstrap632(X, y)
@@ -28,10 +28,8 @@ def evaluate_using_bootstrap(classifier, X, y, n_folds=10):
         sensitivity_train = TP_train / P_train
         specificity_train = TN_train / N_train
 
-        accuracy_train = ((sensitivity_train *
-                          (P_train / (P_train + N_train))) +
-                          (specificity_train *
-                          (N_train / (P_train + N_train))))
+        gmean_train = math.fabs(math.sqrt(sensitivity_train *
+                                specificity_train))
 
         cf_test = confusion_matrix(y_test, y_pred, labels=[-1, 1])
         print cf_test
@@ -45,19 +43,18 @@ def evaluate_using_bootstrap(classifier, X, y, n_folds=10):
         sensitivity_test = TP_test / P_test
         specificity_test = TN_test / N_test
 
-        accuracy_test = ((sensitivity_test * (P_test / (P_test + N_test))) +
-                         (specificity_test * (N_test / (P_test + N_test))))
-        acc_train.append(accuracy_train)
-        acc_test.append(accuracy_test)
+        gmean_test = math.fabs(math.sqrt(sensitivity_test * specificity_test))
+        gmean_train.append(gmean_train)
+        gmean_test.append(gmean_test)
 
         print "sensitivity test: " + str(round(sensitivity_test, 5))
         print "specificity test: " + str(round(specificity_test, 5))
-        print "   accuracy test: " + str(round(accuracy_test, 5))
+        print "      gmean test: " + str(round(gmean_test, 5))
         print ""
 
-    acc_m = (0.632 * np.mean(acc_test)) + (0.368 * np.mean(acc_train))
-    print "Accuracy of the model: " + str(acc_m)
-    return acc_m, clf_list
+    gmean_m = (0.632 * np.mean(gmean_test)) + (0.368 * np.mean(gmean_train))
+    print "gmean of the model: " + str(gmean_m)
+    return gmean_m, clf_list
 
 
 def cross_validate_stratify(clf, X_train, X_test, y_train, y_test, skf):
@@ -72,50 +69,37 @@ def cross_validate_stratify(clf, X_train, X_test, y_train, y_test, skf):
     metrics = ([get_metrics(svm, xtst, ytst)
                for svm, (xtr, xtst, ytr, ytst) in zip(classifiers, cv)])
 
-    # ([sensitivity, specificity, fscore, accuracy, auroc_score, matrix,
-    #        [fpr, tpr, thresholds]])
-    sensitivity_list = ([sens for (sens, spec, fscore, acc, auroc, matrix,
-                        [fp, tp, th]) in metrics])
-    specificity_list = ([spec for (sens, spec, fscore, acc, auroc, matrix,
-                        [fp, tp, th]) in metrics])
-    fscore_list = ([fscore for (sens, spec, fscore, acc, auroc, matrix,
-                   [fp, tp, th]) in metrics])
-    accuracy_list = ([acc for (sens, spec, fscore, acc, auroc, matrix,
-                     [fp, tp, th]) in metrics])
-    roc_auc_list = ([auroc for (sens, spec, fscore, acc, auroc, matrix,
-                    [fp, tp, th]) in metrics])
+    # sensitivity, specificity, matthews, gmean, matrix
+    sensitivity_list = [sens for (sens, spec, matt, gmean, matrix) in metrics]
+    specificity_list = [spec for (sens, spec, matt, gmean, matrix) in metrics]
+    matthews_list = [matt for (sens, spec, matt, gmean, matrix) in metrics]
+    gmean_list = [gmean for (sens, spec, matt, gmean, matrix) in metrics]
 
     sensitivity_index = sensitivity_list.index(max(sensitivity_list))
     specificity_index = specificity_list.index(max(specificity_list))
-    fscore_index = fscore_list.index(max(fscore_list))
-    accuracy_index = accuracy_list.index(max(accuracy_list))
-    roc_auc_index = roc_auc_list.index(max(roc_auc_list))
+    matthews_index = matthews_list.index(max(matthews_list))
+    gmean_index = gmean_list.index(max(gmean_list))
 
-    best_acc = classifiers[accuracy_index]
     best_sens = classifiers[sensitivity_index]
-    best_fscore = classifiers[fscore_index]
     best_spec = classifiers[specificity_index]
-    best_auroc = classifiers[roc_auc_index]
+    best_matt = classifiers[matthews_index]
+    best_gmean = classifiers[gmean_index]
 
-    acc_metrics_train = metrics[accuracy_index]
     sens_metrics_train = metrics[sensitivity_index]
-    fscore_metrics_train = metrics[fscore_index]
     spec_metrics_train = metrics[specificity_index]
-    auroc_metrics_train = metrics[roc_auc_index]
+    matt_metrics_train = metrics[matthews_index]
+    gmean_metrics_train = metrics[gmean_index]
 
-    acc_metrics_test = get_metrics(best_acc, X_test, y_test)
     sens_metrics_test = get_metrics(best_sens, X_test, y_test)
-    fscore_metrics_test = get_metrics(best_fscore, X_test, y_test)
     spec_metrics_test = get_metrics(best_spec, X_test, y_test)
-    auroc_metrics_test = get_metrics(best_auroc, X_test, y_test)
+    matt_metrics_test = get_metrics(best_matt, X_test, y_test)
+    gmean_metrics_test = get_metrics(best_gmean, X_test, y_test)
 
-    return {"acc_model": [best_acc, acc_metrics_train, acc_metrics_test],
-            "sens_model": [best_sens, sens_metrics_train, sens_metrics_test],
+    return {"sens_model": [best_sens, sens_metrics_train, sens_metrics_test],
             "spec_model": [best_spec, spec_metrics_train, spec_metrics_test],
-            "auroc_model": ([best_auroc, auroc_metrics_train,
-                            auroc_metrics_test]),
-            "fscore_model": ([best_fscore, fscore_metrics_train,
-                             fscore_metrics_test])
+            "matt_model": [best_matt, matt_metrics_train, matt_metrics_test],
+            "gmean_model": ([best_gmean, gmean_metrics_train,
+                            gmean_metrics_test]),
             }
 
 
@@ -132,30 +116,23 @@ def get_metrics(clf, X, y):
     sensitivity = TP / P
     specificity = TN / N
 
-    accuracy = (sensitivity * (P / (P + N))) + (specificity * (N / (P + N)))
+    gmean = math.fabs(math.sqrt(sensitivity * specificity))
+    matthews = matthews_corrcoef(y, y_pred)
 
-    yreshape = np.reshape(y, (len(y), 1))
-    scores = clf.predict_proba(X)[:, 1]
-    auroc_score = roc_auc_score(yreshape, scores, average='weighted')
-    fpr, tpr, thresholds = roc_curve(y, scores, pos_label=1)
-    fscore = f1_score(y, y_pred)
-    return ([sensitivity, specificity, fscore, accuracy, auroc_score, matrix,
-            [fpr, tpr, thresholds]])
+    return sensitivity, specificity, matthews, gmean, matrix
 
 
 def present_metrics(result, label):
     print "####### TRAIN " + label + " #######"
     print "SENSITIVITY: " + str(result[1][0])
     print "SPECIFICITY: " + str(result[1][1])
-    print "FSCORE: " + str(result[1][2])
-    print "ACCURACY: " + str(result[1][3])
-    print "AUROC: " + str(result[1][4])
-    print result[1][5]
-
+    print "MATTHEWS CORR COEF: " + str(result[1][2])
+    print "GMEAN: " + str(result[1][3])
+    print result[1][4]
+    print ""
     print "####### TEST " + label + " #######"
     print "SENSITIVITY: " + str(result[2][0])
     print "SPECIFICITY: " + str(result[2][1])
-    print "FSCORE: " + str(result[2][2])
-    print "ACCURACY: " + str(result[2][3])
-    print "AUROC: " + str(result[2][4])
-    print result[2][5]
+    print "MATTHEWS CORR COEF: " + str(result[2][2])
+    print "GMEAN: " + str(result[2][3])
+    print result[2][4]
