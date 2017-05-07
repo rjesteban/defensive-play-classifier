@@ -100,6 +100,10 @@ def cross_validate_stratify(clf, X_train, X_test, y_train, y_test, skf):
             "matt_model": [best_matt, matt_metrics_train, matt_metrics_test],
             "gmean_model": ([best_gmean, gmean_metrics_train,
                             gmean_metrics_test]),
+            "sens_cross_val": np.mean(sensitivity_list),
+            "spec_cross_val": np.mean(specificity_list),
+            "matt_cross_val": np.mean(matthews_list),
+            "gmean_cross_val": np.mean(gmean_list)
             }
 
 
@@ -123,16 +127,22 @@ def get_metrics(clf, X, y):
 
 
 def present_metrics(result, label):
-    print "####### TRAIN " + label + " #######"
-    print "SENSITIVITY: " + str(result[1][0])
-    print "SPECIFICITY: " + str(result[1][1])
-    print "MATTHEWS CORR COEF: " + str(result[1][2])
-    print "GMEAN: " + str(result[1][3])
-    print result[1][4]
-    print ""
+    # print "####### TRAIN " + label + " #######"
+    # print "SENSITIVITY: " + str(result[1][0])
+    # print "SPECIFICITY: " + str(result[1][1])
+    # print "MATTHEWS CORR COEF: " + str(result[1][2])
+    # print "GMEAN: " + str(result[1][3])
+    # matrix_train = result[1][4]
+    # print "\n\nCONFUSION MATRIX"
+    # print str(matrix_train[1][1]) + "\t" + str(matrix_train[1][0])
+    # print str(matrix_train[0][1]) + "\t" + str(matrix_train[0][0])
+    # print ""
     print "####### TEST " + label + " #######"
     print "SENSITIVITY: " + str(result[2][0])
     print "SPECIFICITY: " + str(result[2][1])
     print "MATTHEWS CORR COEF: " + str(result[2][2])
     print "GMEAN: " + str(result[2][3])
-    print result[2][4]
+    matrix_test = result[2][4]
+    print "\n\nCONFUSION MATRIX"
+    print str(matrix_test[1][1]) + "\t" + str(matrix_test[1][0])
+    print str(matrix_test[0][1]) + "\t" + str(matrix_test[0][0])
