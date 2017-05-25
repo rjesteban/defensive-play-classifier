@@ -127,16 +127,16 @@ def get_metrics(clf, X, y):
 
 
 def present_metrics(result, label):
-    # print "####### TRAIN " + label + " #######"
-    # print "SENSITIVITY: " + str(result[1][0])
-    # print "SPECIFICITY: " + str(result[1][1])
-    # print "MATTHEWS CORR COEF: " + str(result[1][2])
-    # print "GMEAN: " + str(result[1][3])
-    # matrix_train = result[1][4]
-    # print "\n\nCONFUSION MATRIX"
-    # print str(matrix_train[1][1]) + "\t" + str(matrix_train[1][0])
-    # print str(matrix_train[0][1]) + "\t" + str(matrix_train[0][0])
-    # print ""
+    print "####### TRAIN " + label + " #######"
+    print "SENSITIVITY: " + str(result[1][0])
+    print "SPECIFICITY: " + str(result[1][1])
+    print "MATTHEWS CORR COEF: " + str(result[1][2])
+    print "GMEAN: " + str(result[1][3])
+    matrix_train = result[1][4]
+    print "\n\nCONFUSION MATRIX"
+    print str(matrix_train[1][1]) + "\t" + str(matrix_train[1][0])
+    print str(matrix_train[0][1]) + "\t" + str(matrix_train[0][0])
+    print ""
     print "####### TEST " + label + " #######"
     print "SENSITIVITY: " + str(result[2][0])
     print "SPECIFICITY: " + str(result[2][1])
